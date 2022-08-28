@@ -83,6 +83,7 @@ public abstract class Users {
         return "User";
     }
 
+
     //Methods
     public Map<Integer,String> GetBrands(){
         Map<Integer,String> list = new HashMap<>();
@@ -330,6 +331,19 @@ public abstract class Users {
             e.printStackTrace();
         }
         return  serviceID;
+    }
+
+    public void deleteRequestByID(int requestID){
+        try
+        {
+            Connection con = DbConnection.getConnection();
+            String sql = "DELETE FROM requests WHERE id_request=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1,requestID);
+            ps.executeUpdate();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
 

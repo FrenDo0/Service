@@ -24,8 +24,9 @@ public class Main {
                 String role = user.checkRole(username, pass);
                 System.out.println("You are logged successfully !");
 
+                    //Client log in
                 if (role.equals("client")) {
-                    System.out.println("Commands: 1 - Create request ");
+                    System.out.println("Commands: 1 - Create request  2 - View all your requests  3 - Edit request  4 - Remove request");
                     Scanner scn = new Scanner(System.in);
                     int num = scn.nextInt();
                     if (num == 1) {
@@ -63,15 +64,80 @@ public class Main {
                         System.out.println("Enter date when you will pick up the car");
                         datePickUp = scanner.nextLine();
                         System.out.println("Enter service");
-                        System.out.println(user.printServices().toString().replace("[","").replace("]","").replace(",","\n"));
+                        System.out.println(user.printServices().toString().replace("[","")
+                                .replace("]","").replace(",","\n"));
                         serviceName = scanner.nextLine();
                         serviceID = user.GetServiceID(serviceName);
 
                         Clients client = new Clients();
                         client.CreateRequest(clientID, vinNum, brandID, modelID,serviceID, dateLeave, datePickUp);
 
+                    }else if(num == 2){
+                        //View request
+
+                        System.out.println("All your requests");
+                        Clients cl = new Clients();
+                        System.out.println(cl.printRequestByClientID(user.GetUserID(username)).toString().replace("[","")
+                                .replace("]","").replace(",",""));
+
+                    }else if(num == 3){
+                        //Edit request
+                        System.out.println("Enter the id of the request you want to edit");
+                        Scanner requestID = new Scanner(System.in);
+                        int reqID = requestID.nextInt();
+                        System.out.println("Enter information below");
+                        int clientID = user.GetUserID(username);
+                        int vinNum = 0;
+                        int serviceID = 0;
+                        String serviceName = "";
+                        int brandID = 0;
+                        String brand = "";
+                        String model = "";
+                        int modelID = 0;
+                        String dateLeave = "";
+                        String datePickUp = "";
+                        Scanner scanner = new Scanner(System.in);
+                        System.out.println("Enter car vin number");
+                        vinNum = scanner.nextInt();
+                        System.out.println("Enter brand from ones below");
+                        for(Map.Entry brands : user.PrintAllBrandAndModels().entrySet()){
+                            System.out.println(brands.toString().replace("{","").replace("}","")
+                                    .replace("="," - ").replace("[","").replace("]",""));
+                        }
+                        scanner.nextLine();
+                        brand = scanner.nextLine();
+                        System.out.println("Enter model from ones below");
+                        for(Map.Entry models : user.PrintAllBrandAndModels().entrySet()){
+                            System.out.println(models.toString().replace("{","").replace("}","")
+                                    .replace("="," - ").replace("[","").replace("]",""));
+                        }
+                        model = scanner.nextLine();
+                        brandID = user.GetBrandID(brand);
+                        modelID = user.GetModelID(model);
+                        System.out.println("Enter date which you will leave the car");
+                        dateLeave = scanner.nextLine();
+                        System.out.println("Enter date when you will pick up the car");
+                        datePickUp = scanner.nextLine();
+                        System.out.println("Enter service");
+                        System.out.println(user.printServices().toString().replace("[","")
+                                .replace("]","").replace(",","\n"));
+                        serviceName = scanner.nextLine();
+                        serviceID = user.GetServiceID(serviceName);
+
+                        Clients client = new Clients();
+                        client.updateRequest(reqID,vinNum,brandID,modelID,serviceID,dateLeave,datePickUp);
+                        System.out.println("Your request has been updated successfully");
+
+                    }else if(num == 4){
+                        //Remove request
+                        System.out.println("Enter the id of the request you want to delete");
+                        Scanner scanner = new Scanner(System.in);
+                        int reqID = scanner.nextInt();
+                        user.deleteRequestByID(reqID);
+                        System.out.println("Your request has been deleted");
                     }
 
+                    //Worker log in
                 } else if (role.equals("worker")) {
                     System.out.println("w");
                 }

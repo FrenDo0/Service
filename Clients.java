@@ -83,7 +83,7 @@ public class Clients extends Users{
         return cl;
     }
 
-    public List<Requests> printRequestByID(int clientID){
+    public List<Requests> printRequestByClientID(int clientID){
         List<Requests> list = new ArrayList<Requests>();
         try
         {
@@ -94,6 +94,7 @@ public class Clients extends Users{
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 Requests req = new Requests();
+                req.setRequestID(rs.getInt("id_request"));
                 req.setClientID(rs.getInt("client_id"));
                 req.setCarVin(rs.getInt("car_vin"));
                 req.setBrandID(rs.getInt("car_brand_id"));
@@ -110,7 +111,7 @@ public class Clients extends Users{
         return  list;
     }
 
-    public void updateRequest(int requestID,int vinNum,int brandID, int modelID,String service, String dateLeave, String datePickUp){
+    public void updateRequest(int requestID,int vinNum,int brandID, int modelID,int service, String dateLeave, String datePickUp){
         try
         {
             Connection con = DbConnection.getConnection();
@@ -121,7 +122,7 @@ public class Clients extends Users{
             ps.setInt(1,vinNum);
             ps.setInt(2,brandID);
             ps.setInt(3,modelID);
-            ps.setString(4,service);
+            ps.setInt(4,service);
             ps.setString(5,dateLeave);
             ps.setString(6,datePickUp);
             ps.executeUpdate();
