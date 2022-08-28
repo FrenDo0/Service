@@ -8,12 +8,12 @@ public class Requests {
     private int modelID;
     private String dateLeave;
     private String datePickUp;
-    private String service;
+    private int service;
     private String status;
 
     public Requests(){};
 
-    public Requests(int clientID,int carVin,int brandID, int modelID,String dateLeave, String datePickUp, String service, String status){
+    public Requests(int clientID,int carVin,int brandID, int modelID,String dateLeave, String datePickUp, int service, String status){
         this.clientID = clientID;
         this.carVin = carVin;
         this.brandID = brandID;
@@ -80,11 +80,11 @@ public class Requests {
         this.datePickUp = datePickUp;
     }
 
-    public String getService() {
+    public int getService() {
         return service;
     }
 
-    public void setService(String service) {
+    public void setService(int service) {
         this.service = service;
     }
 
@@ -97,7 +97,11 @@ public class Requests {
     }
 
     public String toString(){
-        return "Request ID: "+this.requestID + " VIN number: " +this.carVin + " Brand: " + this.brandID + " Model: " + this.modelID
-                + " Date of leaving: " + this.dateLeave + " Date of taking: " + this.datePickUp + " Service: " + this.service + " Status: " + this.status;
+        Workers ws = new Workers();
+        System.out.print("Request ID: "+this.requestID + " VIN number: " +this.carVin + " Brand: " + ws.GetBrandName(this.brandID)
+                + " Model: " + ws.GetModelName(this.modelID) + " Date of leaving: "
+                + this.dateLeave + " Date of taking: " + this.datePickUp
+                + " Service: " + ws.GetService(this.service) + " Status: " + this.status + "\n");
+        return "";
     }
 }

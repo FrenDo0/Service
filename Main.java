@@ -1,6 +1,4 @@
-
-import java.sql.*;
-import java.util.Arrays;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -19,11 +17,11 @@ public class Main {
             String username = str.nextLine();
             System.out.println("Enter password: ");
             String pass = str.nextLine();
-            Users us = new Clients();
+            Users user = new Clients();
 
-            if (us.isExisting(username, pass)) {
+            if (user.isExisting(username, pass)) {
 
-                String role = us.checkRole(username, pass);
+                String role = user.checkRole(username, pass);
                 System.out.println("You are logged successfully !");
 
                 if (role.equals("client")) {
@@ -32,9 +30,10 @@ public class Main {
                     int num = scn.nextInt();
                     if (num == 1) {
                         System.out.println("Enter information below");
-                        //int clientID,int vinNum,int brandID, int modelID, String dateLeave, String datePickUp
-                        int clientID = us.GetUserID(username);
+                        int clientID = user.GetUserID(username);
                         int vinNum = 0;
+                        int serviceID = 0;
+                        String serviceName = "";
                         int brandID = 0;
                         String brand = "";
                         String model = "";
@@ -45,21 +44,31 @@ public class Main {
                         System.out.println("Enter car vin number");
                         vinNum = scanner.nextInt();
                         System.out.println("Enter brand from ones below");
-                        System.out.println(us.PrintAllBrandAndModels());
+                        for(Map.Entry brands : user.PrintAllBrandAndModels().entrySet()){
+                            System.out.println(brands.toString().replace("{","").replace("}","")
+                                    .replace("="," - ").replace("[","").replace("]",""));
+                        }
                         scanner.nextLine();
                         brand = scanner.nextLine();
                         System.out.println("Enter model from ones below");
-                        System.out.println(us.PrintAllBrandAndModels());
+                        for(Map.Entry models : user.PrintAllBrandAndModels().entrySet()){
+                            System.out.println(models.toString().replace("{","").replace("}","")
+                                    .replace("="," - ").replace("[","").replace("]",""));
+                        }
                         model = scanner.nextLine();
-                        brandID = us.GetBrandID(brand);
-                        modelID = us.GetModelID(model);
+                        brandID = user.GetBrandID(brand);
+                        modelID = user.GetModelID(model);
                         System.out.println("Enter date which you will leave the car");
                         dateLeave = scanner.nextLine();
                         System.out.println("Enter date when you will pick up the car");
                         datePickUp = scanner.nextLine();
+                        System.out.println("Enter service");
+                        System.out.println(user.printServices().toString().replace("[","").replace("]","").replace(",","\n"));
+                        serviceName = scanner.nextLine();
+                        serviceID = user.GetServiceID(serviceName);
 
                         Clients client = new Clients();
-                        client.CreateRequest(clientID, vinNum, brandID, modelID,"service", dateLeave, datePickUp);
+                        client.CreateRequest(clientID, vinNum, brandID, modelID,serviceID, dateLeave, datePickUp);
 
                     }
 
@@ -67,7 +76,7 @@ public class Main {
                     System.out.println("w");
                 }
 
-            } else if (!us.isExisting(username, pass)) {
+            } else if (!user.isExisting(username, pass)) {
                 System.out.println("Wrong username or password !");
             }
 

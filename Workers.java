@@ -169,7 +169,7 @@ public class Workers extends Users{
                 req.setCarVin(rs.getInt("car_vin"));
                 req.setBrandID(rs.getInt("car_brand_id"));
                 req.setModelID(rs.getInt("car_model_id"));
-                req.setService(rs.getString("service"));
+                req.setService(rs.getInt("service"));
                 req.setDateLeave(rs.getString("date_leave"));
                 req.setDatePickUp(rs.getString("date_pickup"));
                 req.setStatus(rs.getString("status"));
@@ -180,5 +180,6 @@ public class Workers extends Users{
         }
         return  list;
     }
+
 
 }

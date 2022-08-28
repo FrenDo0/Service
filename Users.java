@@ -83,8 +83,6 @@ public abstract class Users {
         return "User";
     }
 
-
-
     //Methods
     public Map<Integer,String> GetBrands(){
         Map<Integer,String> list = new HashMap<>();
@@ -139,15 +137,32 @@ public abstract class Users {
 
             while(rs.next()){
                 String key = rs.getString("brand_name");
-                if (!list.containsKey(key))
+                if (!list.containsKey(key)){
                     list.put(key, new LinkedList<String>());
-
+                }
                 list.get(key).add(rs.getString("model_name"));
             }
         }catch(Exception e){
             e.printStackTrace();
         }
         return  list;
+    }
+
+    public List<String> printServices(){
+        List<String> list = new ArrayList<>();
+        try
+        {
+            Connection con = DbConnection.getConnection();
+            String sql = "SELECT * FROM services";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                list.add(rs.getString("service_name"));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return list;
     }
 
     public int GetUserID(String username){
@@ -186,6 +201,42 @@ public abstract class Users {
             e.printStackTrace();
         }
         return result;
+    }
+
+    public String GetBrandName(int brandID){
+        String name = "";
+        try
+        {
+            Connection con = DbConnection.getConnection();
+            String sql = "SELECT * FROM brands WHERE id_brand=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1,brandID);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                name = rs.getString("brand_name");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return name;
+    }
+
+    public String GetModelName(int modelID){
+        String name = "";
+        try
+        {
+            Connection con = DbConnection.getConnection();
+            String sql = "SELECT * FROM models WHERE id_model=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1,modelID);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                name = rs.getString("model_name");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return name;
     }
 
     public int GetModelID(String model){
@@ -243,6 +294,42 @@ public abstract class Users {
             e.printStackTrace();
         }
         return  role;
+    }
+
+    public String GetService(int serviceID){
+        String name = "";
+        try
+        {
+            Connection con = DbConnection.getConnection();
+            String sql = "SELECT * FROM services WHERE id_service=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1,serviceID);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                name = rs.getString("service_name");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return name;
+    }
+
+    public int GetServiceID(String service){
+        int serviceID = 0;
+        try
+        {
+            Connection con = DbConnection.getConnection();
+            String sql = "SELECT * FROM services WHERE service_name=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1,service);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                serviceID = rs.getInt("id_service");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  serviceID;
     }
 }
 
