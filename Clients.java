@@ -1,6 +1,7 @@
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 public class Clients extends Users{
@@ -18,11 +19,9 @@ public class Clients extends Users{
 
     public void createNewProfile(Users client){
         strClause = " (user_fname,user_sname,user_username,user_password,user_role) VALUES (?,?,?,?,?)";
-        try
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlInsert+tableUsers+strClause);)
         {
             client.setRole("client");
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlInsert+tableUsers+strClause);
             ps.setString(1, client.getFirstName());
             ps.setString(2, client.getSecondName());
             ps.setString(3, client.getUsername());
@@ -38,11 +37,9 @@ public class Clients extends Users{
     public void createRequest(int clientID,int vinNum,int brandID, int modelID,int service, String dateLeave, String datePickUp){
 
         strClause = " (client_id,car_vin,car_brand_id,car_model_id,service,date_leave,date_pickup,status) VALUES (?,?,?,?,?,?,?,?)";
-        try
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlInsert+tableRequests+strClause))
         {
             String status = "pending";
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlInsert+tableRequests+strClause);
             ps.setInt(1,clientID);
             ps.setInt(2,vinNum);
             ps.setInt(3,brandID);
@@ -61,13 +58,9 @@ public class Clients extends Users{
     public Clients getUserInformation(int userID){
         Clients cl = new Clients();
         strClause = " WHERE id_user=?";
-        try
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause);ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause);
             ps.setInt(1,userID);
-            ResultSet rs = ps.executeQuery();
-
             if(rs.next()){
                 cl.setFirstName(rs.getString("user_fname"));
                 cl.setSecondName(rs.getString("user_sname"));
@@ -84,12 +77,9 @@ public class Clients extends Users{
     public List<Requests> printRequestByClientID(int clientID){
         List<Requests> list = new ArrayList<Requests>();
         strClause = " WHERE client_id=?";
-        try
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableRequests+strClause); ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableRequests+strClause);
             ps.setInt(1,clientID);
-            ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 Requests req = new Requests();
                 req.setRequestID(rs.getInt("id_request"));
@@ -110,13 +100,10 @@ public class Clients extends Users{
     }
 
     public void updateRequest(int requestID,int vinNum,int brandID, int modelID,int service, String dateLeave, String datePickUp){
-
-        try
+        String sql = "UPDATE requests SET car_vin=?,car_brand_id=?,car_model_id=?,service=?,date_leave=?,date_pickup=?" +
+                "WHERE id_request=?";
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql))
         {
-            Connection con = DbConnection.getConnection();
-            String sql = "UPDATE requests SET car_vin=?,car_brand_id=?,car_model_id=?,service=?,date_leave=?,date_pickup=?" +
-                    "WHERE id_request=?";
-            PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(7,requestID);
             ps.setInt(1,vinNum);
             ps.setInt(2,brandID);

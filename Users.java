@@ -97,12 +97,8 @@ public abstract class Users {
     //Methods
     public Map<Integer,String> getBrands(){
         Map<Integer,String> list = new HashMap<>();
-        try
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlSelect+tableBrands); ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableBrands);
-            ResultSet rs = ps.executeQuery();
-
             while(rs.next()){
                 list.put(rs.getInt("id_brand"),rs.getString("brand_name"));
             }
@@ -116,12 +112,8 @@ public abstract class Users {
     public Map<Integer,String> getModels(){
 
         Map<Integer,String> list = new HashMap<>();
-        try
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableModels);ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableModels);
-            ResultSet rs = ps.executeQuery();
-
             while(rs.next()){
                 list.put(rs.getInt("id_model"),rs.getString("model_name"));
             }
@@ -135,14 +127,9 @@ public abstract class Users {
     public Map<String, List<String>> printAllBrandAndModels(){
 
         Map<String,List<String>> list = new LinkedHashMap<>();
-
-        try
+        String sql = "SELECT b.brand_name, m.model_name FROM brands b, models m WHERE b.id_brand = m.brand_id";
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sql);ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            String sql = "SELECT b.brand_name, m.model_name FROM brands b, models m WHERE b.id_brand = m.brand_id";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-
             while(rs.next()){
                 String key = rs.getString("brand_name");
                 if (!list.containsKey(key)){
@@ -159,11 +146,8 @@ public abstract class Users {
     public List<String> printServices(){
         List<String> list = new ArrayList<>();
 
-        try
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableServices);ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableServices);
-            ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 list.add(rs.getString("service_name"));
             }
@@ -176,13 +160,9 @@ public abstract class Users {
     public int getUserIDNumber(String username){
         int result = 0;
         strClause = " WHERE user_username=?";
-        try
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause); ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause);
             ps.setString(1,username);
-            ResultSet rs = ps.executeQuery();
-
             if(rs.next()){
                 result = rs.getInt("id_user");
             }
@@ -196,12 +176,9 @@ public abstract class Users {
     public int getBrandID(String brand){
         int result = 0;
         strClause = " WHERE brand_name";
-        try
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableBrands+strClause);ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableBrands+strClause);
             ps.setString(1,brand);
-            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 result = rs.getInt("id_brand");
             }
@@ -214,12 +191,9 @@ public abstract class Users {
     public String getBrandName(int brandID){
         String name = "";
         strClause = " WHERE id_brand=?";
-        try
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlSelect+tableBrands+strClause); ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableBrands+strClause);
             ps.setInt(1,brandID);
-            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 name = rs.getString("brand_name");
             }
@@ -232,12 +206,9 @@ public abstract class Users {
     public String getModelName(int modelID){
         String name = "";
         strClause = " WHERE id_model=?";
-        try
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableModels+strClause);ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableModels+strClause);
             ps.setInt(1,modelID);
-            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 name = rs.getString("model_name");
             }
@@ -250,12 +221,9 @@ public abstract class Users {
     public int getModelID(String model){
         int result = 0;
         strClause = " WHERE model_name=?";
-        try
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlSelect+tableModels+strClause);ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableModels+strClause);
             ps.setString(1,model);
-            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 result = rs.getInt("id_model");
             }
@@ -268,13 +236,10 @@ public abstract class Users {
     public boolean isExisting(String userName,String passWord){
         boolean isExisting = false;
         strClause = " WHERE user_username=? AND user_password=?";
-        try
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause);ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause);
             ps.setString(1,userName);
             ps.setString(2,passWord);
-            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 isExisting = true;
             }
@@ -287,14 +252,11 @@ public abstract class Users {
 
     public String checkRole(String userName,String pass){
         String role = "";
-        try
+        String sql = "SELECT user_role FROM users WHERE user_username=? AND user_password=?";
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            String sql = "SELECT user_role FROM users WHERE user_username=? AND user_password=?";
-            PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1,userName);
             ps.setString(2,pass);
-            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 role = rs.getString("user_role");
             }
@@ -307,12 +269,9 @@ public abstract class Users {
     public String getService(int serviceID){
         String name = "";
         strClause = " WHERE id_service=?";
-        try
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableServices+strClause);ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableServices+strClause);
             ps.setInt(1,serviceID);
-            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 name = rs.getString("service_name");
             }
@@ -325,12 +284,9 @@ public abstract class Users {
     public int getServiceID(String service){
         int serviceID = 0;
         strClause = " WHERE service_name=?";
-        try
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableServices+strClause); ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableServices+strClause);
             ps.setString(1,service);
-            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 serviceID = rs.getInt("id_service");
             }
@@ -342,10 +298,8 @@ public abstract class Users {
 
     public void deleteRequestByID(int requestID){
         strClause = " WHERE id_request=?";
-        try
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlDelete+tableRequests+strClause);)
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlDelete+tableRequests+strClause);
             ps.setInt(1,requestID);
             ps.executeUpdate();
         }catch (Exception e){

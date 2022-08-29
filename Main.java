@@ -6,8 +6,6 @@ public class Main {
     public static void main(String[] args) {
 
         System.out.println("Welcome to our service portal");
-        Users usa = new Clients();
-        System.out.println(usa.getBrands());
         System.out.println("Useful commands:  1 - Log in  2 - Register as worker  3 - Register as client");
         Scanner sc = new Scanner(System.in);
         int input = sc.nextInt();

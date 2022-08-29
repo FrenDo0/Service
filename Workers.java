@@ -21,11 +21,10 @@ public class Workers extends Users{
 
     public void createNewProfile(Users worker){
         strClause = "(user_fname,user_sname,user_username,user_password,user_role) VALUES (?,?,?,?,?)";
-        try
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlInsert+tableUsers+strClause))
         {
             worker.setRole("worker");
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlInsert+tableUsers+strClause);
+
             ps.setString(1, worker.getFirstName());
             ps.setString(2, worker.getSecondName());
             ps.setString(3, worker.getUsername());
@@ -41,13 +40,9 @@ public class Workers extends Users{
     public Workers getUserInformation(int userID){
         Workers cl = new Workers();
         strClause = " WHERE id_user=?";
-        try
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause); ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause);
             ps.setInt(1,userID);
-            ResultSet rs = ps.executeQuery();
-
             if(rs.next()){
                 cl.setFirstName(rs.getString("user_fname"));
                 cl.setSecondName(rs.getString("user_sname"));
@@ -63,10 +58,8 @@ public class Workers extends Users{
 
     public void addBrand(String brand){
         strClause = " (brand_name) VALUES (?)";
-        try
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlInsert+tableBrands+strClause))
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlInsert+tableBrands+strClause);
             ps.setString(1,brand);
             ps.executeUpdate();
         }catch (Exception e){
@@ -77,10 +70,8 @@ public class Workers extends Users{
     public void addModel(String brand, String model){
         int brandID = getBrandID(brand);
         strClause = " (brand_id,model_name) VALUES(?,?)";
-        try
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlInsert+tableModels+strClause))
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlInsert+tableModels+strClause);
             ps.setInt(1,brandID);
             ps.setString(2,model);
             ps.executeUpdate();
@@ -91,10 +82,8 @@ public class Workers extends Users{
 
     public void deleteBrand(int brandID){
         strClause = " WHERE id_brand=?";
-        try
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlDelete+tableBrands+strClause))
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlDelete+tableBrands+strClause);
             ps.setInt(1,brandID);
             ps.executeUpdate();
         }catch (Exception e){
@@ -104,10 +93,8 @@ public class Workers extends Users{
 
     public void deleteModel(int modelID){
         strClause = " WHERE id_model=?";
-        try
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlDelete+tableModels+strClause))
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlDelete+tableModels+strClause);
             ps.setInt(1,modelID);
             ps.executeUpdate();
         }catch (Exception e){
@@ -117,11 +104,8 @@ public class Workers extends Users{
 
     public void deleteUserProfile(int userID){
         strClause = " WHERE id_user=?";
-        try
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlDelete+tableUsers+strClause))
         {
-            Connection con = DbConnection.getConnection();
-            String sql = "DELETE FROM users WHERE id_user=?";
-            PreparedStatement ps = con.prepareStatement(sqlDelete+tableUsers+strClause);
             ps.setInt(1,userID);
             ps.executeUpdate();
         }catch (Exception e){
@@ -131,11 +115,8 @@ public class Workers extends Users{
 
     public void addNewService(String serviceName){
         strClause = " (service_name) VALUES (?)";
-        try
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlInsert+tableServices+strClause))
         {
-            Connection con = DbConnection.getConnection();
-            String sql = "INSERT INTO services (service_name) VALUES (?)";
-            PreparedStatement ps = con.prepareStatement(sqlInsert+tableServices+strClause);
             ps.setString(1,serviceName);
             ps.executeUpdate();
         }catch (Exception e){
@@ -145,10 +126,8 @@ public class Workers extends Users{
 
     public void deleteService(int serviceID){
         strClause = " WHERE id_service=?";
-        try
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlDelete+tableServices+strClause);)
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlDelete+tableServices+strClause);
             ps.setInt(1,serviceID);
             ps.executeUpdate();
         }catch (Exception e){
@@ -158,11 +137,8 @@ public class Workers extends Users{
 
     public List<Requests> printAllRequests(){
         List<Requests> list = new ArrayList<>();
-        try
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableRequests); ResultSet rs = ps.executeQuery())
         {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sqlSelect+tableRequests);
-            ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 Requests req = new Requests();
                 req.setRequestID(rs.getInt("id_request"));
