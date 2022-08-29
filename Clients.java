@@ -16,14 +16,13 @@ public class Clients extends Users{
         return "Client details " + this.getFirstName() +" "+ this.getSecondName() +" "+ this.getUsername() +" "+ this.getPassword() +" "+ this.getRole();
     }
 
-    public void CreateNewProfile(Users client){
+    public void createNewProfile(Users client){
+        strClause = " (user_fname,user_sname,user_username,user_password,user_role) VALUES (?,?,?,?,?)";
         try
         {
             client.setRole("client");
             Connection con = DbConnection.getConnection();
-            String sql = "INSERT INTO users" +
-                    "(user_fname,user_sname,user_username,user_password,user_role)" + "VALUES (?,?,?,?,?)";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlInsert+tableUsers+strClause);
             ps.setString(1, client.getFirstName());
             ps.setString(2, client.getSecondName());
             ps.setString(3, client.getUsername());
@@ -36,15 +35,14 @@ public class Clients extends Users{
         }
     }
 
-    public void CreateRequest(int clientID,int vinNum,int brandID, int modelID,int service, String dateLeave, String datePickUp){
+    public void createRequest(int clientID,int vinNum,int brandID, int modelID,int service, String dateLeave, String datePickUp){
 
+        strClause = " (client_id,car_vin,car_brand_id,car_model_id,service,date_leave,date_pickup,status) VALUES (?,?,?,?,?,?,?,?)";
         try
         {
             String status = "pending";
             Connection con = DbConnection.getConnection();
-            String sql = "INSERT INTO requests" +"(client_id,car_vin,car_brand_id,car_model_id,service,date_leave,date_pickup,status)"+
-                    "VALUES (?,?,?,?,?,?,?,?)";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlInsert+tableRequests+strClause);
             ps.setInt(1,clientID);
             ps.setInt(2,vinNum);
             ps.setInt(3,brandID);
@@ -62,11 +60,11 @@ public class Clients extends Users{
 
     public Clients getUserInformation(int userID){
         Clients cl = new Clients();
+        strClause = " WHERE id_user=?";
         try
         {
             Connection con = DbConnection.getConnection();
-            String sql = "SELECT * FROM users WHERE id_user = ?";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause);
             ps.setInt(1,userID);
             ResultSet rs = ps.executeQuery();
 
@@ -85,11 +83,11 @@ public class Clients extends Users{
 
     public List<Requests> printRequestByClientID(int clientID){
         List<Requests> list = new ArrayList<Requests>();
+        strClause = " WHERE client_id=?";
         try
         {
             Connection con = DbConnection.getConnection();
-            String sql = "SELECT * FROM requests WHERE client_id=?";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlSelect+tableRequests+strClause);
             ps.setInt(1,clientID);
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
@@ -112,6 +110,7 @@ public class Clients extends Users{
     }
 
     public void updateRequest(int requestID,int vinNum,int brandID, int modelID,int service, String dateLeave, String datePickUp){
+
         try
         {
             Connection con = DbConnection.getConnection();

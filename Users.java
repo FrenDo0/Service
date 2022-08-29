@@ -12,6 +12,16 @@ public abstract class Users {
     private String password;
     private String role;
 
+    public String tableBrands = " brands";
+    public String tableModels = " models";
+    public String tableUsers = " users";
+    public String tableServices = " services";
+    public String tableRequests = " requests";
+    public String strClause;
+    public String sqlSelect = "SELECT * FROM";
+    public String sqlInsert = "INSERT INTO";
+    public String sqlDelete = "DELETE FROM";
+
     public Users(String firstName,String secondName,String username,String password,String role){
         this.firstName = firstName;
         this.secondName = secondName;
@@ -75,7 +85,7 @@ public abstract class Users {
 
 
     //Abstract methods
-    public abstract void CreateNewProfile(Users user);
+    public abstract void createNewProfile(Users user);
     public abstract Users getUserInformation(int userID);
 
 
@@ -85,13 +95,12 @@ public abstract class Users {
 
 
     //Methods
-    public Map<Integer,String> GetBrands(){
+    public Map<Integer,String> getBrands(){
         Map<Integer,String> list = new HashMap<>();
         try
         {
             Connection con = DbConnection.getConnection();
-            String sql = "SELECT * FROM brands";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlSelect+tableBrands);
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()){
@@ -104,15 +113,13 @@ public abstract class Users {
         return list;
     }
 
-    public Map<Integer,String> GetModels(){
+    public Map<Integer,String> getModels(){
 
         Map<Integer,String> list = new HashMap<>();
-
         try
         {
             Connection con = DbConnection.getConnection();
-            String sql = "SELECT * FROM models";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlSelect+tableModels);
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()){
@@ -125,7 +132,7 @@ public abstract class Users {
         return list;
     }
 
-    public Map<String, List<String>> PrintAllBrandAndModels(){
+    public Map<String, List<String>> printAllBrandAndModels(){
 
         Map<String,List<String>> list = new LinkedHashMap<>();
 
@@ -151,11 +158,11 @@ public abstract class Users {
 
     public List<String> printServices(){
         List<String> list = new ArrayList<>();
+
         try
         {
             Connection con = DbConnection.getConnection();
-            String sql = "SELECT * FROM services";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlSelect+tableServices);
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 list.add(rs.getString("service_name"));
@@ -166,13 +173,13 @@ public abstract class Users {
         return list;
     }
 
-    public int GetUserID(String username){
+    public int getUserIDNumber(String username){
         int result = 0;
+        strClause = " WHERE user_username=?";
         try
         {
             Connection con = DbConnection.getConnection();
-            String sql = "SELECT * FROM users WHERE user_username=?";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause);
             ps.setString(1,username);
             ResultSet rs = ps.executeQuery();
 
@@ -186,13 +193,13 @@ public abstract class Users {
 
     }
 
-    public int GetBrandID(String brand){
+    public int getBrandID(String brand){
         int result = 0;
+        strClause = " WHERE brand_name";
         try
         {
             Connection con = DbConnection.getConnection();
-            String sql = "SELECT * FROM brands WHERE brand_name=?";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlSelect+tableBrands+strClause);
             ps.setString(1,brand);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
@@ -204,13 +211,13 @@ public abstract class Users {
         return result;
     }
 
-    public String GetBrandName(int brandID){
+    public String getBrandName(int brandID){
         String name = "";
+        strClause = " WHERE id_brand=?";
         try
         {
             Connection con = DbConnection.getConnection();
-            String sql = "SELECT * FROM brands WHERE id_brand=?";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlSelect+tableBrands+strClause);
             ps.setInt(1,brandID);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
@@ -222,13 +229,13 @@ public abstract class Users {
         return name;
     }
 
-    public String GetModelName(int modelID){
+    public String getModelName(int modelID){
         String name = "";
+        strClause = " WHERE id_model=?";
         try
         {
             Connection con = DbConnection.getConnection();
-            String sql = "SELECT * FROM models WHERE id_model=?";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlSelect+tableModels+strClause);
             ps.setInt(1,modelID);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
@@ -240,13 +247,13 @@ public abstract class Users {
         return name;
     }
 
-    public int GetModelID(String model){
+    public int getModelID(String model){
         int result = 0;
+        strClause = " WHERE model_name=?";
         try
         {
             Connection con = DbConnection.getConnection();
-            String sql = "SELECT * FROM models WHERE model_name=?";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlSelect+tableModels+strClause);
             ps.setString(1,model);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
@@ -260,11 +267,11 @@ public abstract class Users {
 
     public boolean isExisting(String userName,String passWord){
         boolean isExisting = false;
+        strClause = " WHERE user_username=? AND user_password=?";
         try
         {
             Connection con = DbConnection.getConnection();
-            String sql = "SELECT * FROM users WHERE user_username=? AND user_password=?";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause);
             ps.setString(1,userName);
             ps.setString(2,passWord);
             ResultSet rs = ps.executeQuery();
@@ -297,13 +304,13 @@ public abstract class Users {
         return  role;
     }
 
-    public String GetService(int serviceID){
+    public String getService(int serviceID){
         String name = "";
+        strClause = " WHERE id_service=?";
         try
         {
             Connection con = DbConnection.getConnection();
-            String sql = "SELECT * FROM services WHERE id_service=?";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlSelect+tableServices+strClause);
             ps.setInt(1,serviceID);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
@@ -315,13 +322,13 @@ public abstract class Users {
         return name;
     }
 
-    public int GetServiceID(String service){
+    public int getServiceID(String service){
         int serviceID = 0;
+        strClause = " WHERE service_name=?";
         try
         {
             Connection con = DbConnection.getConnection();
-            String sql = "SELECT * FROM services WHERE service_name=?";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlSelect+tableServices+strClause);
             ps.setString(1,service);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
@@ -334,11 +341,11 @@ public abstract class Users {
     }
 
     public void deleteRequestByID(int requestID){
+        strClause = " WHERE id_request=?";
         try
         {
             Connection con = DbConnection.getConnection();
-            String sql = "DELETE FROM requests WHERE id_request=?";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sqlDelete+tableRequests+strClause);
             ps.setInt(1,requestID);
             ps.executeUpdate();
         }catch (Exception e){

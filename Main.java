@@ -6,6 +6,8 @@ public class Main {
     public static void main(String[] args) {
 
         System.out.println("Welcome to our service portal");
+        Users usa = new Clients();
+        System.out.println(usa.getBrands());
         System.out.println("Useful commands:  1 - Log in  2 - Register as worker  3 - Register as client");
         Scanner sc = new Scanner(System.in);
         int input = sc.nextInt();
@@ -31,7 +33,7 @@ public class Main {
                     int num = scn.nextInt();
                     if (num == 1) {
                         System.out.println("Enter information below");
-                        int clientID = user.GetUserID(username);
+                        int clientID = user.getUserIDNumber(username);
                         int vinNum = 0;
                         int serviceID = 0;
                         String serviceName = "";
@@ -45,20 +47,20 @@ public class Main {
                         System.out.println("Enter car vin number");
                         vinNum = scanner.nextInt();
                         System.out.println("Enter brand from ones below");
-                        for(Map.Entry brands : user.PrintAllBrandAndModels().entrySet()){
+                        for(Map.Entry brands : user.printAllBrandAndModels().entrySet()){
                             System.out.println(brands.toString().replace("{","").replace("}","")
                                     .replace("="," - ").replace("[","").replace("]",""));
                         }
                         scanner.nextLine();
                         brand = scanner.nextLine();
                         System.out.println("Enter model from ones below");
-                        for(Map.Entry models : user.PrintAllBrandAndModels().entrySet()){
+                        for(Map.Entry models : user.printAllBrandAndModels().entrySet()){
                             System.out.println(models.toString().replace("{","").replace("}","")
                                     .replace("="," - ").replace("[","").replace("]",""));
                         }
                         model = scanner.nextLine();
-                        brandID = user.GetBrandID(brand);
-                        modelID = user.GetModelID(model);
+                        brandID = user.getBrandID(brand);
+                        modelID = user.getModelID(model);
                         System.out.println("Enter date which you will leave the car");
                         dateLeave = scanner.nextLine();
                         System.out.println("Enter date when you will pick up the car");
@@ -67,17 +69,17 @@ public class Main {
                         System.out.println(user.printServices().toString().replace("[","")
                                 .replace("]","").replace(",","\n"));
                         serviceName = scanner.nextLine();
-                        serviceID = user.GetServiceID(serviceName);
+                        serviceID = user.getServiceID(serviceName);
 
                         Clients client = new Clients();
-                        client.CreateRequest(clientID, vinNum, brandID, modelID,serviceID, dateLeave, datePickUp);
+                        client.createRequest(clientID, vinNum, brandID, modelID,serviceID, dateLeave, datePickUp);
 
                     }else if(num == 2){
                         //View request
 
                         System.out.println("All your requests");
                         Clients cl = new Clients();
-                        System.out.println(cl.printRequestByClientID(user.GetUserID(username)).toString().replace("[","")
+                        System.out.println(cl.printRequestByClientID(user.getUserIDNumber(username)).toString().replace("[","")
                                 .replace("]","").replace(",",""));
 
                     }else if(num == 3){
@@ -86,7 +88,7 @@ public class Main {
                         Scanner requestID = new Scanner(System.in);
                         int reqID = requestID.nextInt();
                         System.out.println("Enter information below");
-                        int clientID = user.GetUserID(username);
+                        int clientID = user.getUserIDNumber(username);
                         int vinNum = 0;
                         int serviceID = 0;
                         String serviceName = "";
@@ -100,20 +102,20 @@ public class Main {
                         System.out.println("Enter car vin number");
                         vinNum = scanner.nextInt();
                         System.out.println("Enter brand from ones below");
-                        for(Map.Entry brands : user.PrintAllBrandAndModels().entrySet()){
+                        for(Map.Entry brands : user.printAllBrandAndModels().entrySet()){
                             System.out.println(brands.toString().replace("{","").replace("}","")
                                     .replace("="," - ").replace("[","").replace("]",""));
                         }
                         scanner.nextLine();
                         brand = scanner.nextLine();
                         System.out.println("Enter model from ones below");
-                        for(Map.Entry models : user.PrintAllBrandAndModels().entrySet()){
+                        for(Map.Entry models : user.printAllBrandAndModels().entrySet()){
                             System.out.println(models.toString().replace("{","").replace("}","")
                                     .replace("="," - ").replace("[","").replace("]",""));
                         }
                         model = scanner.nextLine();
-                        brandID = user.GetBrandID(brand);
-                        modelID = user.GetModelID(model);
+                        brandID = user.getBrandID(brand);
+                        modelID = user.getModelID(model);
                         System.out.println("Enter date which you will leave the car");
                         dateLeave = scanner.nextLine();
                         System.out.println("Enter date when you will pick up the car");
@@ -122,7 +124,7 @@ public class Main {
                         System.out.println(user.printServices().toString().replace("[","")
                                 .replace("]","").replace(",","\n"));
                         serviceName = scanner.nextLine();
-                        serviceID = user.GetServiceID(serviceName);
+                        serviceID = user.getServiceID(serviceName);
 
                         Clients client = new Clients();
                         client.updateRequest(reqID,vinNum,brandID,modelID,serviceID,dateLeave,datePickUp);
@@ -165,7 +167,7 @@ public class Main {
             worker.setUsername(username);
             worker.setPassword(pass);
             Workers wk = new Workers();
-            wk.CreateNewProfile(worker);
+            wk.createNewProfile(worker);
 
         } else if (input == 3) {
 
@@ -186,7 +188,7 @@ public class Main {
             client.setUsername(username);
             client.setPassword(pass);
             Clients cl = new Clients();
-            cl.CreateNewProfile(client);
+            cl.createNewProfile(client);
         }
 
     }

@@ -98,10 +98,10 @@ public class Requests {
 
     public String toString(){
         Workers ws = new Workers();
-        System.out.print("Request ID: "+this.requestID + " VIN number: " +this.carVin + " Brand: " + ws.GetBrandName(this.brandID)
-                + " Model: " + ws.GetModelName(this.modelID) + " Date of leaving: "
+        System.out.print("Request ID: "+this.requestID + " VIN number: " +this.carVin + " Brand: " + ws.getBrandName(this.brandID)
+                + " Model: " + ws.getModelName(this.modelID) + " Date of leaving: "
                 + this.dateLeave + " Date of taking: " + this.datePickUp
-                + " Service: " + ws.GetService(this.service) + " Status: " + this.status + "\n");
+                + " Service: " + ws.getService(this.service) + " Status: " + this.status + "\n");
         return "";
     }
 }

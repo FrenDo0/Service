@@ -3,7 +3,7 @@ import java.sql.DriverManager;
 
 public class DbConnection {
 
-    static Connection con;
+    private static Connection con;
 
     public static Connection getConnection() throws Exception{
         if(con == null){
