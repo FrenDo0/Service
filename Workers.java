@@ -1,7 +1,9 @@
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Workers extends Users{
@@ -20,29 +22,23 @@ public class Workers extends Users{
     }
 
     public void createNewProfile(Users worker){
-        strClause = "(user_fname,user_sname,user_username,user_password,user_role) VALUES (?,?,?,?,?)";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlInsert+tableUsers+strClause))
-        {
-            worker.setRole("worker");
-
-            ps.setString(1, worker.getFirstName());
-            ps.setString(2, worker.getSecondName());
-            ps.setString(3, worker.getUsername());
-            ps.setString(4, worker.getPassword());
-            ps.setString(5, worker.getRole());
-            ps.executeUpdate();
-
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+        str_clause = "(user_fname,user_sname,user_username,user_password,user_role) VALUES (?,?,?,?,?)";
+        String sql = SQL_INSERT + TABLE_USERS + str_clause;
+        worker.setRole("worker");
+        List<String> list = new ArrayList<>();
+        Collections.addAll(list,worker.getFirstName(),worker.getSecondName(),worker.getUsername(),worker.getPassword(),worker.getRole());
+        dbUpdateStr(sql,list);
     }
 
     public Workers getUserInformation(int userID){
         Workers cl = new Workers();
-        strClause = " WHERE id_user=?";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause); ResultSet rs = ps.executeQuery())
+        str_clause = " WHERE id_user=?";
+        try
         {
+            Connection con = DbConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_USERS+str_clause);
             ps.setInt(1,userID);
+            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 cl.setFirstName(rs.getString("user_fname"));
                 cl.setSecondName(rs.getString("user_sname"));
@@ -51,94 +47,78 @@ public class Workers extends Users{
                 cl.setRole(rs.getString("user_role"));
             }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.out.println("get user information - workers");
         }
         return cl;
     }
 
     public void addBrand(String brand){
-        strClause = " (brand_name) VALUES (?)";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlInsert+tableBrands+strClause))
-        {
-            ps.setString(1,brand);
-            ps.executeUpdate();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        str_clause = " (brand_name) VALUES (?)";
+        String sql = SQL_INSERT + TABLE_BRANDS + str_clause;
+        List<String> list = new ArrayList<>();
+        list.add(brand);
+        dbUpdateStr(sql,list);
     }
 
-    public void addModel(String brand, String model){
-        int brandID = getBrandID(brand);
-        strClause = " (brand_id,model_name) VALUES(?,?)";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlInsert+tableModels+strClause))
-        {
-            ps.setInt(1,brandID);
-            ps.setString(2,model);
-            ps.executeUpdate();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+    //String brand, String model -> method getBrandID
+    public void addModel(int brandID, String model){
+        str_clause = " (model_name,brand_id) VALUES(?,?)";
+        String sql = SQL_INSERT + TABLE_MODELS + str_clause;
+        List<String> listStr = new ArrayList<>();
+        List<Integer> listInt = new ArrayList<>();
+        listStr.add(model);
+        listInt.add(brandID);
+        dbUpdate(sql,listStr,listInt);
     }
 
     public void deleteBrand(int brandID){
-        strClause = " WHERE id_brand=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlDelete+tableBrands+strClause))
-        {
-            ps.setInt(1,brandID);
-            ps.executeUpdate();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        str_clause = " WHERE id_brand=?";
+        String sql = SQL_DELETE + TABLE_BRANDS + str_clause;
+        List<Integer> list = new ArrayList<>();
+        list.add(brandID);
+        dbUpdateInt(sql,list);
     }
 
     public void deleteModel(int modelID){
-        strClause = " WHERE id_model=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlDelete+tableModels+strClause))
-        {
-            ps.setInt(1,modelID);
-            ps.executeUpdate();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        str_clause = " WHERE id_model=?";
+        String sql = SQL_DELETE + TABLE_MODELS + str_clause;
+        List<Integer> list = new ArrayList<>();
+        list.add(modelID);
+        dbUpdateInt(sql,list);
     }
 
     public void deleteUserProfile(int userID){
-        strClause = " WHERE id_user=?";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlDelete+tableUsers+strClause))
-        {
-            ps.setInt(1,userID);
-            ps.executeUpdate();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        str_clause = " WHERE id_user=?";
+        String sql = SQL_DELETE + TABLE_USERS + str_clause;
+        List<Integer> list = new ArrayList<>();
+        list.add(userID);
+        dbUpdateInt(sql,list);
     }
 
     public void addNewService(String serviceName){
-        strClause = " (service_name) VALUES (?)";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlInsert+tableServices+strClause))
-        {
-            ps.setString(1,serviceName);
-            ps.executeUpdate();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        str_clause = " (service_name) VALUES (?)";
+        String sql = SQL_INSERT + TABLE_SERVICE + str_clause;
+        List<String> list = new ArrayList<>();
+        list.add(serviceName);
+        dbUpdateStr(sql,list);
     }
 
     public void deleteService(int serviceID){
-        strClause = " WHERE id_service=?";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlDelete+tableServices+strClause);)
-        {
-            ps.setInt(1,serviceID);
-            ps.executeUpdate();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        str_clause = " WHERE id_service=?";
+        String sql = SQL_DELETE + TABLE_SERVICE + str_clause;
+        List<Integer> list = new ArrayList<>();
+        list.add(serviceID);
+        dbUpdateInt(sql,list);
     }
 
     public List<Requests> printAllRequests(){
         List<Requests> list = new ArrayList<>();
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableRequests); ResultSet rs = ps.executeQuery())
+        try
         {
+            Connection con = DbConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_REQUESTS);
+            ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 Requests req = new Requests();
                 req.setRequestID(rs.getInt("id_request"));
@@ -153,10 +133,8 @@ public class Workers extends Users{
                 list.add(req);
             }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return  list;
     }
-
-
 }

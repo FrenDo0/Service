@@ -1,9 +1,10 @@
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
-public abstract class Users {
+public abstract class Users extends DbConnection{
 
     private int userID;
     private String firstName;
@@ -12,15 +13,15 @@ public abstract class Users {
     private String password;
     private String role;
 
-    public String tableBrands = " brands";
-    public String tableModels = " models";
-    public String tableUsers = " users";
-    public String tableServices = " services";
-    public String tableRequests = " requests";
-    public String strClause;
-    public String sqlSelect = "SELECT * FROM";
-    public String sqlInsert = "INSERT INTO";
-    public String sqlDelete = "DELETE FROM";
+    public String str_clause;
+    public static final String TABLE_BRANDS = " brands";
+    public static final String TABLE_MODELS = " models";
+    public static final String TABLE_USERS = " users";
+    public static final String TABLE_SERVICE = " services";
+    public static final String TABLE_REQUESTS = " requests";
+    public static final String SQL_SELECT = "SELECT * FROM";
+    public static final String SQL_INSERT = "INSERT INTO";
+    public static final String SQL_DELETE = "DELETE FROM";
 
     public Users(String firstName,String secondName,String username,String password,String role){
         this.firstName = firstName;
@@ -83,7 +84,6 @@ public abstract class Users {
     }
 
 
-
     //Abstract methods
     public abstract void createNewProfile(Users user);
     public abstract Users getUserInformation(int userID);
@@ -93,18 +93,72 @@ public abstract class Users {
         return "User";
     }
 
-
     //Methods
+    public void dbUpdate(String sql,List<String> strings, List<Integer> ints){
+        int position = 1;
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sql)){
+            if(!strings.isEmpty()){
+                for(int i = 0; i < strings.size(); i++){
+                    ps.setString(position,strings.get(i));
+                    position++;
+                }
+            }
+            if(!ints.isEmpty()){
+                for(int i = 0; i < ints.size(); i++){
+                    ps.setInt(position,ints.get(i));
+                    position++;
+                }
+            }
+            ps.executeUpdate();
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+            System.out.println("SQL Exception");
+        }
+    }
+
+    public void dbUpdateStr(String sql, List<String> strings){
+        int position = 1;
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sql)){
+            if(!strings.isEmpty()){
+                for(int i = 0; i < strings.size(); i++){
+                    ps.setString(position,strings.get(i));
+                    position++;
+                }
+            }
+            ps.executeUpdate();
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+            System.out.println("SQL Exception");
+        }
+    }
+
+    public void dbUpdateInt(String sql, List<Integer> ints){
+        int position = 1;
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sql)){
+            if(!ints.isEmpty()){
+                for(int i = 0; i < ints.size(); i++){
+                    ps.setInt(position,ints.get(i));
+                    position++;
+                }
+            }
+            ps.executeUpdate();
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+            System.out.println("SQL Exception");
+        }
+    }
+
     public Map<Integer,String> getBrands(){
         Map<Integer,String> list = new HashMap<>();
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlSelect+tableBrands); ResultSet rs = ps.executeQuery())
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_BRANDS))
         {
+            ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 list.put(rs.getInt("id_brand"),rs.getString("brand_name"));
             }
 
         }catch(Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return list;
     }
@@ -112,14 +166,15 @@ public abstract class Users {
     public Map<Integer,String> getModels(){
 
         Map<Integer,String> list = new HashMap<>();
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableModels);ResultSet rs = ps.executeQuery())
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_MODELS))
         {
+            ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 list.put(rs.getInt("id_model"),rs.getString("model_name"));
             }
 
         }catch(Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return list;
     }
@@ -128,8 +183,9 @@ public abstract class Users {
 
         Map<String,List<String>> list = new LinkedHashMap<>();
         String sql = "SELECT b.brand_name, m.model_name FROM brands b, models m WHERE b.id_brand = m.brand_id";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sql);ResultSet rs = ps.executeQuery())
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sql))
         {
+            ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 String key = rs.getString("brand_name");
                 if (!list.containsKey(key)){
@@ -138,7 +194,7 @@ public abstract class Users {
                 list.get(key).add(rs.getString("model_name"));
             }
         }catch(Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return  list;
     }
@@ -146,28 +202,30 @@ public abstract class Users {
     public List<String> printServices(){
         List<String> list = new ArrayList<>();
 
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableServices);ResultSet rs = ps.executeQuery())
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_SERVICE))
         {
+            ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 list.add(rs.getString("service_name"));
             }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return list;
     }
 
     public int getUserIDNumber(String username){
         int result = 0;
-        strClause = " WHERE user_username=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause); ResultSet rs = ps.executeQuery())
+        str_clause = " WHERE user_username=?";
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_USERS+str_clause))
         {
             ps.setString(1,username);
+            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 result = rs.getInt("id_user");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return result;
 
@@ -175,137 +233,148 @@ public abstract class Users {
 
     public int getBrandID(String brand){
         int result = 0;
-        strClause = " WHERE brand_name";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableBrands+strClause);ResultSet rs = ps.executeQuery())
+        str_clause = " WHERE brand_name=?";
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_BRANDS+str_clause))
         {
             ps.setString(1,brand);
-            if(rs.next()){
+            ResultSet rs = ps.executeQuery();
+            if(rs.next())
                 result = rs.getInt("id_brand");
-            }
+
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return result;
     }
 
     public String getBrandName(int brandID){
         String name = "";
-        strClause = " WHERE id_brand=?";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlSelect+tableBrands+strClause); ResultSet rs = ps.executeQuery())
+        str_clause = " WHERE id_brand=?";
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_BRANDS+str_clause))
         {
             ps.setInt(1,brandID);
+            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 name = rs.getString("brand_name");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.out.println("get brand name");
         }
         return name;
     }
 
     public String getModelName(int modelID){
         String name = "";
-        strClause = " WHERE id_model=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableModels+strClause);ResultSet rs = ps.executeQuery())
+        str_clause = " WHERE id_model=?";
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_MODELS+str_clause))
         {
             ps.setInt(1,modelID);
+            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 name = rs.getString("model_name");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.out.println("get model name");
         }
         return name;
     }
 
     public int getModelID(String model){
         int result = 0;
-        strClause = " WHERE model_name=?";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlSelect+tableModels+strClause);ResultSet rs = ps.executeQuery())
+        str_clause = " WHERE model_name=?";
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_MODELS+str_clause))
         {
             ps.setString(1,model);
+            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 result = rs.getInt("id_model");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return result;
     }
 
     public boolean isExisting(String userName,String passWord){
         boolean isExisting = false;
-        strClause = " WHERE user_username=? AND user_password=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause);ResultSet rs = ps.executeQuery())
+        str_clause = " WHERE user_username=? AND user_password=?";
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_USERS+str_clause))
         {
             ps.setString(1,userName);
             ps.setString(2,passWord);
+            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 isExisting = true;
             }
 
         }catch (Exception e){
-            e.printStackTrace();
+           System.out.println(e.getMessage());
+           System.out.println("existing shit");
         }
         return isExisting;
     }
 
     public String checkRole(String userName,String pass){
         String role = "";
-        String sql = "SELECT user_role FROM users WHERE user_username=? AND user_password=?";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery())
+        try
         {
+            Connection con = DbConnection.getConnection();
+            String sql = "SELECT user_role FROM users WHERE user_username=? AND user_password=?";
+            PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1,userName);
             ps.setString(2,pass);
+            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 role = rs.getString("user_role");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return  role;
     }
 
     public String getService(int serviceID){
         String name = "";
-        strClause = " WHERE id_service=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableServices+strClause);ResultSet rs = ps.executeQuery())
+        str_clause = " WHERE id_service=?";
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_SERVICE+str_clause))
         {
             ps.setInt(1,serviceID);
+            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 name = rs.getString("service_name");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return name;
     }
 
     public int getServiceID(String service){
         int serviceID = 0;
-        strClause = " WHERE service_name=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableServices+strClause); ResultSet rs = ps.executeQuery())
+        str_clause = " WHERE service_name=?";
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_SERVICE+str_clause))
         {
             ps.setString(1,service);
+            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 serviceID = rs.getInt("id_service");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return  serviceID;
     }
 
     public void deleteRequestByID(int requestID){
-        strClause = " WHERE id_request=?";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlDelete+tableRequests+strClause);)
-        {
-            ps.setInt(1,requestID);
-            ps.executeUpdate();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        str_clause = " WHERE id_request=?";
+        String sql = SQL_DELETE+ TABLE_REQUESTS + str_clause;
+        List<Integer> list = new ArrayList<>();
+        list.add(requestID);
+        dbUpdateInt(sql,list);
     }
+
 }
 
 

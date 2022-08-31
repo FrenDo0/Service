@@ -18,49 +18,32 @@ public class Clients extends Users{
     }
 
     public void createNewProfile(Users client){
-        strClause = " (user_fname,user_sname,user_username,user_password,user_role) VALUES (?,?,?,?,?)";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlInsert+tableUsers+strClause);)
-        {
-            client.setRole("client");
-            ps.setString(1, client.getFirstName());
-            ps.setString(2, client.getSecondName());
-            ps.setString(3, client.getUsername());
-            ps.setString(4, client.getPassword());
-            ps.setString(5, client.getRole());
-            ps.executeUpdate();
-
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+        str_clause = " (user_fname,user_sname,user_username,user_password,user_role) VALUES (?,?,?,?,?)";
+        String sql = SQL_INSERT + TABLE_USERS + str_clause;
+        List<String> list = new ArrayList<>();
+        client.setRole("client");
+        Collections.addAll(list,client.getFirstName(),client.getSecondName(),client.getUsername(),client.getPassword(),client.getRole());
+        dbUpdateStr(sql,list);
     }
 
     public void createRequest(int clientID,int vinNum,int brandID, int modelID,int service, String dateLeave, String datePickUp){
-
-        strClause = " (client_id,car_vin,car_brand_id,car_model_id,service,date_leave,date_pickup,status) VALUES (?,?,?,?,?,?,?,?)";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sqlInsert+tableRequests+strClause))
-        {
-            String status = "pending";
-            ps.setInt(1,clientID);
-            ps.setInt(2,vinNum);
-            ps.setInt(3,brandID);
-            ps.setInt(4,modelID);
-            ps.setInt(5,service);
-            ps.setString(6,dateLeave);
-            ps.setString(7,datePickUp);
-            ps.setString(8,status);
-            ps.executeUpdate();
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        str_clause = " (client_id,car_vin,car_brand_id,car_model_id,service,date_leave,date_pickup,status) VALUES (?,?,?,?,?,?,?,?)";
+        String sql = SQL_INSERT + TABLE_REQUESTS + str_clause;
+        String status = "pending";
+        List<Integer> listInt = new ArrayList<>();
+        List<String> listStr = new ArrayList<>();
+        Collections.addAll(listInt,clientID,vinNum,brandID,modelID,service);
+        Collections.addAll(listStr,dateLeave,datePickUp,status);
+        dbUpdate(sql,listStr,listInt);
     }
 
     public Clients getUserInformation(int userID){
         Clients cl = new Clients();
-        strClause = " WHERE id_user=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableUsers+strClause);ResultSet rs = ps.executeQuery())
+        str_clause = " WHERE id_user=?";
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_USERS+str_clause))
         {
             ps.setInt(1,userID);
+            ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 cl.setFirstName(rs.getString("user_fname"));
                 cl.setSecondName(rs.getString("user_sname"));
@@ -69,17 +52,18 @@ public class Clients extends Users{
                 cl.setRole(rs.getString("user_role"));
             }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return cl;
     }
 
     public List<Requests> printRequestByClientID(int clientID){
         List<Requests> list = new ArrayList<Requests>();
-        strClause = " WHERE client_id=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sqlSelect+tableRequests+strClause); ResultSet rs = ps.executeQuery())
+        str_clause = " WHERE client_id=?";
+        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_REQUESTS+str_clause))
         {
             ps.setInt(1,clientID);
+            ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 Requests req = new Requests();
                 req.setRequestID(rs.getInt("id_request"));
@@ -94,27 +78,10 @@ public class Clients extends Users{
                 list.add(req);
             }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.out.println("Print request by client");
         }
         return  list;
     }
 
-    public void updateRequest(int requestID,int vinNum,int brandID, int modelID,int service, String dateLeave, String datePickUp){
-        String sql = "UPDATE requests SET car_vin=?,car_brand_id=?,car_model_id=?,service=?,date_leave=?,date_pickup=?" +
-                "WHERE id_request=?";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql))
-        {
-            ps.setInt(7,requestID);
-            ps.setInt(1,vinNum);
-            ps.setInt(2,brandID);
-            ps.setInt(3,modelID);
-            ps.setInt(4,service);
-            ps.setString(5,dateLeave);
-            ps.setString(6,datePickUp);
-            ps.executeUpdate();
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
 }
