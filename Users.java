@@ -112,7 +112,7 @@ public abstract class Users extends DbConnection{
             ps.executeUpdate();
         }catch (SQLException e){
             System.out.println(e.getMessage());
-            System.out.println("SQL Exception");
+            System.out.println("dbUpdate method SQL Exception");
         }
     }
 
@@ -128,7 +128,7 @@ public abstract class Users extends DbConnection{
             ps.executeUpdate();
         }catch (SQLException e){
             System.out.println(e.getMessage());
-            System.out.println("SQL Exception");
+            System.out.println("dbUpdaetStr method SQL Exception");
         }
     }
 
@@ -144,7 +144,7 @@ public abstract class Users extends DbConnection{
             ps.executeUpdate();
         }catch (SQLException e){
             System.out.println(e.getMessage());
-            System.out.println("SQL Exception");
+            System.out.println("dbUpdateInt method SQL Exception");
         }
     }
 
@@ -159,6 +159,7 @@ public abstract class Users extends DbConnection{
 
         }catch(Exception e){
             System.out.println(e.getMessage());
+            System.out.println("getBrands method SQL Exception");
         }
         return list;
     }
@@ -175,6 +176,7 @@ public abstract class Users extends DbConnection{
 
         }catch(Exception e){
             System.out.println(e.getMessage());
+            System.out.println("getModels method SQL Exception");
         }
         return list;
     }
@@ -195,6 +197,7 @@ public abstract class Users extends DbConnection{
             }
         }catch(Exception e){
             System.out.println(e.getMessage());
+            System.out.println("printAllBrandAndModels method SQL Exception");
         }
         return  list;
     }
@@ -210,6 +213,7 @@ public abstract class Users extends DbConnection{
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
+            System.out.println("printServices method SQL Exception");
         }
         return list;
     }
@@ -226,6 +230,7 @@ public abstract class Users extends DbConnection{
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
+            System.out.println("getUserIDNumber method SQL Exception");
         }
         return result;
 
@@ -243,6 +248,7 @@ public abstract class Users extends DbConnection{
 
         }catch (Exception e){
             System.out.println(e.getMessage());
+            System.out.println("getBrandID method SQL Exception");
         }
         return result;
     }
@@ -259,7 +265,7 @@ public abstract class Users extends DbConnection{
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
-            System.out.println("get brand name");
+            System.out.println("getBrandName method SQL Exception");
         }
         return name;
     }
@@ -276,7 +282,7 @@ public abstract class Users extends DbConnection{
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
-            System.out.println("get model name");
+            System.out.println("getModelName method SQL Exception");
         }
         return name;
     }
@@ -293,6 +299,7 @@ public abstract class Users extends DbConnection{
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
+            System.out.println("getModelID method SQL Exception");
         }
         return result;
     }
@@ -311,7 +318,7 @@ public abstract class Users extends DbConnection{
 
         }catch (Exception e){
            System.out.println(e.getMessage());
-           System.out.println("existing shit");
+            System.out.println("isExisting method SQL Exception");
         }
         return isExisting;
     }
@@ -331,6 +338,7 @@ public abstract class Users extends DbConnection{
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
+            System.out.println("checkRole method SQL Exception");
         }
         return  role;
     }
@@ -347,6 +355,7 @@ public abstract class Users extends DbConnection{
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
+            System.out.println("getService method SQL Exception");
         }
         return name;
     }
@@ -363,6 +372,7 @@ public abstract class Users extends DbConnection{
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
+            System.out.println("getServiceID method SQL Exception");
         }
         return  serviceID;
     }

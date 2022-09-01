@@ -1,8 +1,9 @@
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Clients extends Users{
 
@@ -53,6 +54,7 @@ public class Clients extends Users{
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
+            System.out.println("getUserInformation method SQL Exception");
         }
         return cl;
     }
@@ -79,7 +81,7 @@ public class Clients extends Users{
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
-            System.out.println("Print request by client");
+            System.out.println("printRequestByClientID method SQL Exception");
         }
         return  list;
     }

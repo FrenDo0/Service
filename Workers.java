@@ -1,7 +1,6 @@
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +47,7 @@ public class Workers extends Users{
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
-            System.out.println("get user information - workers");
+            System.out.println("getUserInformation method SQL Exception");
         }
         return cl;
     }
@@ -134,6 +133,7 @@ public class Workers extends Users{
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
+            System.out.println("printAllRequests method SQL Exception");
         }
         return  list;
     }
