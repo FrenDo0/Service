@@ -24,9 +24,9 @@ public class Workers extends Users{
         str_clause = "(user_fname,user_sname,user_username,user_password,user_role) VALUES (?,?,?,?,?)";
         String sql = SQL_INSERT + TABLE_USERS + str_clause;
         worker.setRole("worker");
-        List<String> list = new ArrayList<>();
+        List<Object> list = new ArrayList<>();
         Collections.addAll(list,worker.getFirstName(),worker.getSecondName(),worker.getUsername(),worker.getPassword(),worker.getRole());
-        dbUpdateStr(sql,list);
+       dbUpdate(sql,list);
     }
 
     public Workers getUserInformation(int userID){
@@ -34,7 +34,7 @@ public class Workers extends Users{
         str_clause = " WHERE id_user=?";
         try
         {
-            Connection con = DbConnection.getConnection();
+            Connection con = (Connection) DbConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_USERS+str_clause);
             ps.setInt(1,userID);
             ResultSet rs = ps.executeQuery();
@@ -55,13 +55,14 @@ public class Workers extends Users{
     public void addBrand(String brand){
         str_clause = " (brand_name) VALUES (?)";
         String sql = SQL_INSERT + TABLE_BRANDS + str_clause;
-        List<String> list = new ArrayList<>();
+        List<Object> list = new ArrayList<>();
         list.add(brand);
-        dbUpdateStr(sql,list);
+        dbUpdate(sql,list);
     }
 
     //String brand, String model -> method getBrandID
-    public void addModel(int brandID, String model){
+    public void addModel(String brand, String model){
+        int brandID = getBrandID(brand);
         str_clause = " (model_name,brand_id) VALUES(?,?)";
         String sql = SQL_INSERT + TABLE_MODELS + str_clause;
         List<String> listStr = new ArrayList<>();
@@ -74,48 +75,48 @@ public class Workers extends Users{
     public void deleteBrand(int brandID){
         str_clause = " WHERE id_brand=?";
         String sql = SQL_DELETE + TABLE_BRANDS + str_clause;
-        List<Integer> list = new ArrayList<>();
+        List<Object> list = new ArrayList<>();
         list.add(brandID);
-        dbUpdateInt(sql,list);
+        dbUpdate(sql,list);
     }
 
     public void deleteModel(int modelID){
         str_clause = " WHERE id_model=?";
         String sql = SQL_DELETE + TABLE_MODELS + str_clause;
-        List<Integer> list = new ArrayList<>();
+        List<Object> list = new ArrayList<>();
         list.add(modelID);
-        dbUpdateInt(sql,list);
+        dbUpdate(sql,list);
     }
 
     public void deleteUserProfile(int userID){
         str_clause = " WHERE id_user=?";
         String sql = SQL_DELETE + TABLE_USERS + str_clause;
-        List<Integer> list = new ArrayList<>();
+        List<Object> list = new ArrayList<>();
         list.add(userID);
-        dbUpdateInt(sql,list);
+        dbUpdate(sql,list);
     }
 
     public void addNewService(String serviceName){
         str_clause = " (service_name) VALUES (?)";
         String sql = SQL_INSERT + TABLE_SERVICE + str_clause;
-        List<String> list = new ArrayList<>();
+        List<Object> list = new ArrayList<>();
         list.add(serviceName);
-        dbUpdateStr(sql,list);
+        dbUpdate(sql,list);
     }
 
     public void deleteService(int serviceID){
         str_clause = " WHERE id_service=?";
         String sql = SQL_DELETE + TABLE_SERVICE + str_clause;
-        List<Integer> list = new ArrayList<>();
+        List<Object> list = new ArrayList<>();
         list.add(serviceID);
-        dbUpdateInt(sql,list);
+        dbUpdate(sql,list);
     }
 
     public List<Requests> printAllRequests(){
         List<Requests> list = new ArrayList<>();
         try
         {
-            Connection con = DbConnection.getConnection();
+            Connection con = (Connection) DbConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_REQUESTS);
             ResultSet rs = ps.executeQuery();
             while(rs.next()){

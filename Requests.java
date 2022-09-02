@@ -103,12 +103,4 @@ public class Requests {
                 + " Service: " + this.service + " Status: " + this.status + "\n");
         return "";
     }
-//    public String toString(){
-//        Workers ws = new Workers();
-//        System.out.print("Request ID: "+this.requestID + " VIN number: " +this.carVin + " Brand: " + this.brandID
-//                + " Model: " + this.modelID + " Date of leaving: "
-//                + this.dateLeave + " Date of taking: " + this.datePickUp
-//                + " Service: " + this.service + " Status: " + this.status + "\n");
-//        return "";
-//    }
 }

@@ -21,10 +21,10 @@ public class Clients extends Users{
     public void createNewProfile(Users client){
         str_clause = " (user_fname,user_sname,user_username,user_password,user_role) VALUES (?,?,?,?,?)";
         String sql = SQL_INSERT + TABLE_USERS + str_clause;
-        List<String> list = new ArrayList<>();
+        List<Object> list = new ArrayList<>();
         client.setRole("client");
         Collections.addAll(list,client.getFirstName(),client.getSecondName(),client.getUsername(),client.getPassword(),client.getRole());
-        dbUpdateStr(sql,list);
+        dbUpdate(sql,list);
     }
 
     public void createRequest(int clientID,int vinNum,int brandID, int modelID,int service, String dateLeave, String datePickUp){
@@ -41,7 +41,7 @@ public class Clients extends Users{
     public Clients getUserInformation(int userID){
         Clients cl = new Clients();
         str_clause = " WHERE id_user=?";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_USERS+str_clause))
+        try(Connection con = (Connection) DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_USERS+str_clause))
         {
             ps.setInt(1,userID);
             ResultSet rs = ps.executeQuery();

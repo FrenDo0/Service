@@ -96,7 +96,7 @@ public abstract class Users extends DbConnection{
     //Methods
     public void dbUpdate(String sql,List<String> strings, List<Integer> ints){
         int position = 1;
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sql)){
+        try(Connection con = (Connection) DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)){
             if(!strings.isEmpty()){
                 for(int i = 0; i < strings.size(); i++){
                     ps.setString(position,strings.get(i));
@@ -116,41 +116,30 @@ public abstract class Users extends DbConnection{
         }
     }
 
-    public void dbUpdateStr(String sql, List<String> strings){
+    public void dbUpdate(String sql, List<Object> list){
         int position = 1;
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sql)){
-            if(!strings.isEmpty()){
-                for(int i = 0; i < strings.size(); i++){
-                    ps.setString(position,strings.get(i));
-                    position++;
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)){
+            if(!list.isEmpty()){
+                for(int i = 0; i < list.size(); i++){
+                    if(list.get(i) instanceof String){
+                        ps.setString(position, String.valueOf(list.get(i)));
+                        position++;
+                    }else if(list.get(i) instanceof Integer){
+                        ps.setInt(position,(Integer)list.get(i));
+                        position++;
+                    }
                 }
             }
             ps.executeUpdate();
         }catch (SQLException e){
             System.out.println(e.getMessage());
-            System.out.println("dbUpdaetStr method SQL Exception");
-        }
-    }
-
-    public void dbUpdateInt(String sql, List<Integer> ints){
-        int position = 1;
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sql)){
-            if(!ints.isEmpty()){
-                for(int i = 0; i < ints.size(); i++){
-                    ps.setInt(position,ints.get(i));
-                    position++;
-                }
-            }
-            ps.executeUpdate();
-        }catch (SQLException e){
-            System.out.println(e.getMessage());
-            System.out.println("dbUpdateInt method SQL Exception");
+            System.out.println("dbUpdate method SQL Exception");
         }
     }
 
     public List<String> dbSelect(String sql, List<String> columns){
         List<String> result = new ArrayList<>();
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql))
+        try(Connection con = (Connection) DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql))
         {
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
@@ -364,9 +353,9 @@ public abstract class Users extends DbConnection{
     public void deleteRequestByID(int requestID){
         str_clause = " WHERE id_request=?";
         String sql = SQL_DELETE+ TABLE_REQUESTS + str_clause;
-        List<Integer> list = new ArrayList<>();
+        List<Object> list = new ArrayList<>();
         list.add(requestID);
-        dbUpdateInt(sql,list);
+        dbUpdate(sql,list);
     }
 
 }
