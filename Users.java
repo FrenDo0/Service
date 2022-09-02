@@ -148,6 +148,52 @@ public abstract class Users extends DbConnection{
         }
     }
 
+    public List<String> dbSelect(String sql, List<String> columns){
+        List<String> result = new ArrayList<>();
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql))
+        {
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                for(int i = 0; i < columns.size(); i++){
+                    result.add(rs.getString(columns.get(i)));
+                }
+            }
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return result;
+    }
+
+    public Integer dbSelectConditionInt(String sql,String column,String condition){
+        Integer result = 0;
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql))
+        {
+            ps.setString(1,condition);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                result = rs.getInt(column);
+            }
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return result;
+    }
+
+    public List<String> dbSelectConditionStr(String sql,String column,Integer condition){
+        List<String> result = new ArrayList<>();
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql))
+        {
+            ps.setInt(1,condition);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                result.add(rs.getString(column));
+            }
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return result;
+    }
+
     public Map<Integer,String> getBrands(){
         Map<Integer,String> list = new HashMap<>();
         try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_BRANDS))
@@ -202,108 +248,6 @@ public abstract class Users extends DbConnection{
         return  list;
     }
 
-    public List<String> printServices(){
-        List<String> list = new ArrayList<>();
-
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_SERVICE))
-        {
-            ResultSet rs = ps.executeQuery();
-            while(rs.next()){
-                list.add(rs.getString("service_name"));
-            }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("printServices method SQL Exception");
-        }
-        return list;
-    }
-
-    public int getUserIDNumber(String username){
-        int result = 0;
-        str_clause = " WHERE user_username=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_USERS+str_clause))
-        {
-            ps.setString(1,username);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                result = rs.getInt("id_user");
-            }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("getUserIDNumber method SQL Exception");
-        }
-        return result;
-
-    }
-
-    public int getBrandID(String brand){
-        int result = 0;
-        str_clause = " WHERE brand_name=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_BRANDS+str_clause))
-        {
-            ps.setString(1,brand);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next())
-                result = rs.getInt("id_brand");
-
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("getBrandID method SQL Exception");
-        }
-        return result;
-    }
-
-    public String getBrandName(int brandID){
-        String name = "";
-        str_clause = " WHERE id_brand=?";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_BRANDS+str_clause))
-        {
-            ps.setInt(1,brandID);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                name = rs.getString("brand_name");
-            }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("getBrandName method SQL Exception");
-        }
-        return name;
-    }
-
-    public String getModelName(int modelID){
-        String name = "";
-        str_clause = " WHERE id_model=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_MODELS+str_clause))
-        {
-            ps.setInt(1,modelID);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                name = rs.getString("model_name");
-            }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("getModelName method SQL Exception");
-        }
-        return name;
-    }
-
-    public int getModelID(String model){
-        int result = 0;
-        str_clause = " WHERE model_name=?";
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_MODELS+str_clause))
-        {
-            ps.setString(1,model);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                result = rs.getInt("id_model");
-            }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("getModelID method SQL Exception");
-        }
-        return result;
-    }
-
     public boolean isExisting(String userName,String passWord){
         boolean isExisting = false;
         str_clause = " WHERE user_username=? AND user_password=?";
@@ -317,7 +261,7 @@ public abstract class Users extends DbConnection{
             }
 
         }catch (Exception e){
-           System.out.println(e.getMessage());
+            System.out.println(e.getMessage());
             System.out.println("isExisting method SQL Exception");
         }
         return isExisting;
@@ -343,37 +287,77 @@ public abstract class Users extends DbConnection{
         return  role;
     }
 
+    public List<String> printServices(){
+        List<String> list = new ArrayList<>();
+        list.add("service_name");
+        String sql = SQL_SELECT + TABLE_SERVICE;
+        return dbSelect(sql,list);
+    }
+
+    public int getUserIDNumber(String username){
+        int result = 0;
+        str_clause = " WHERE user_username=?";
+        String sql = SQL_SELECT + TABLE_USERS + str_clause;
+        String column = "id_user";
+        result = dbSelectConditionInt(sql,column,username);
+        return  result;
+
+    }
+
+    public int getBrandID(String brand){
+        int result = 0;
+        str_clause = " WHERE brand_name=?";
+        String sql = SQL_SELECT+TABLE_BRANDS+str_clause;
+        String column = "id_brand";
+        result = dbSelectConditionInt(sql,column,brand);
+        return result;
+    }
+
+    public String getBrandName(int brandID){
+        String name = "";
+        str_clause = " WHERE id_brand=?";
+        String sql = SQL_SELECT+TABLE_BRANDS+str_clause;
+        String column = "brand_name";
+        List<String> list = dbSelectConditionStr(sql,column,brandID);
+        name = list.get(0);
+        return name;
+    }
+
+    public String getModelName(int modelID){
+        String name = "";
+        str_clause = " WHERE id_model=?";
+        String column = "model_name";
+        String sql = SQL_SELECT+TABLE_MODELS+str_clause;
+        List<String> list = dbSelectConditionStr(sql,column,modelID);
+        name = list.get(0);
+        return name;
+    }
+
+    public int getModelID(String model){
+        int result = 0;
+        str_clause = " WHERE model_name=?";
+        String column = "id_model";
+        String sql = SQL_SELECT+TABLE_MODELS+str_clause;
+        result = dbSelectConditionInt(sql,column,model);
+        return result;
+    }
+
     public String getService(int serviceID){
         String name = "";
         str_clause = " WHERE id_service=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_SERVICE+str_clause))
-        {
-            ps.setInt(1,serviceID);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                name = rs.getString("service_name");
-            }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("getService method SQL Exception");
-        }
+        String column = "service_name";
+        String sql = SQL_SELECT+TABLE_SERVICE+str_clause;
+        List<String> list = dbSelectConditionStr(sql,column,serviceID);
+        name = list.get(0);
         return name;
     }
 
     public int getServiceID(String service){
         int serviceID = 0;
         str_clause = " WHERE service_name=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_SERVICE+str_clause))
-        {
-            ps.setString(1,service);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                serviceID = rs.getInt("id_service");
-            }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("getServiceID method SQL Exception");
-        }
+        String sql = SQL_SELECT+TABLE_SERVICE+str_clause;
+        String column = "id_service";
+        serviceID = dbSelectConditionInt(sql,column,service);
         return  serviceID;
     }
 
