@@ -153,29 +153,22 @@ public abstract class Users extends DbConnection{
         return result;
     }
 
-    public Integer dbSelectConditionInt(String sql,String column,String condition){
-        Integer result = 0;
+    public List<Object> dbSelect(String sql,String column, Object condition){
+        List<Object> result = new ArrayList<>();
         try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql))
         {
-            ps.setString(1,condition);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                result = rs.getInt(column);
-            }
-        }catch (SQLException e){
-            System.out.println(e.getMessage());
-        }
-        return result;
-    }
-
-    public List<String> dbSelectConditionStr(String sql,String column,Integer condition){
-        List<String> result = new ArrayList<>();
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql))
-        {
-            ps.setInt(1,condition);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                result.add(rs.getString(column));
+            if(condition instanceof String){
+                ps.setString(1, (String) condition);
+                ResultSet rs = ps.executeQuery();
+                if(rs.next()){
+                    result.add(rs.getInt(column));
+                }
+            }else if(condition instanceof Integer){
+                ps.setInt(1,(Integer) condition);
+                ResultSet rs = ps.executeQuery();
+                if(rs.next()){
+                    result.add(rs.getString(column));
+                }
             }
         }catch (SQLException e){
             System.out.println(e.getMessage());
@@ -283,23 +276,22 @@ public abstract class Users extends DbConnection{
         return dbSelect(sql,list);
     }
 
-    public int getUserIDNumber(String username){
-        int result = 0;
+    public Object getUserIDNumber(String username){
+        List<Object> list = new ArrayList<>();
         str_clause = " WHERE user_username=?";
         String sql = SQL_SELECT + TABLE_USERS + str_clause;
         String column = "id_user";
-        result = dbSelectConditionInt(sql,column,username);
-        return  result;
-
+        list.add(dbSelect(sql,column,username));
+        return list;
     }
 
-    public int getBrandID(String brand){
-        int result = 0;
+    public Object getBrandID(String brand){
+        List<Object> list = new ArrayList<>();
         str_clause = " WHERE brand_name=?";
         String sql = SQL_SELECT+TABLE_BRANDS+str_clause;
         String column = "id_brand";
-        result = dbSelectConditionInt(sql,column,brand);
-        return result;
+        list.add((dbSelect(sql,column,brand)));
+        return list;
     }
 
     public String getBrandName(int brandID){
@@ -307,8 +299,8 @@ public abstract class Users extends DbConnection{
         str_clause = " WHERE id_brand=?";
         String sql = SQL_SELECT+TABLE_BRANDS+str_clause;
         String column = "brand_name";
-        List<String> list = dbSelectConditionStr(sql,column,brandID);
-        name = list.get(0);
+        List<Object> list = dbSelect(sql,column,brandID);
+        name = (String) list.get(0);
         return name;
     }
 
@@ -317,18 +309,19 @@ public abstract class Users extends DbConnection{
         str_clause = " WHERE id_model=?";
         String column = "model_name";
         String sql = SQL_SELECT+TABLE_MODELS+str_clause;
-        List<String> list = dbSelectConditionStr(sql,column,modelID);
-        name = list.get(0);
+        List<Object> list = dbSelect(sql,column,modelID);
+        name = (String) list.get(0);
         return name;
     }
 
-    public int getModelID(String model){
-        int result = 0;
+    public Object getModelID(String model){
+        List<Object> list = new ArrayList<>();
         str_clause = " WHERE model_name=?";
         String column = "id_model";
         String sql = SQL_SELECT+TABLE_MODELS+str_clause;
-        result = dbSelectConditionInt(sql,column,model);
-        return result;
+        list.add(dbSelect(sql,column,model));
+
+        return list;
     }
 
     public String getService(int serviceID){
@@ -336,18 +329,18 @@ public abstract class Users extends DbConnection{
         str_clause = " WHERE id_service=?";
         String column = "service_name";
         String sql = SQL_SELECT+TABLE_SERVICE+str_clause;
-        List<String> list = dbSelectConditionStr(sql,column,serviceID);
-        name = list.get(0);
+        List<Object> list = dbSelect(sql,column,serviceID);
+        name = (String) list.get(0);
         return name;
     }
 
-    public int getServiceID(String service){
-        int serviceID = 0;
+    public Object getServiceID(String service){
+        List<Object> list = new ArrayList<>();
         str_clause = " WHERE service_name=?";
         String sql = SQL_SELECT+TABLE_SERVICE+str_clause;
         String column = "id_service";
-        serviceID = dbSelectConditionInt(sql,column,service);
-        return  serviceID;
+        list.add(dbSelect(sql,column,service));
+        return list;
     }
 
     public void deleteRequestByID(int requestID){

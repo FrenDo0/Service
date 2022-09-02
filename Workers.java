@@ -61,8 +61,7 @@ public class Workers extends Users{
     }
 
     //String brand, String model -> method getBrandID
-    public void addModel(String brand, String model){
-        int brandID = getBrandID(brand);
+    public void addModel(Integer brandID, String model){
         str_clause = " (model_name,brand_id) VALUES(?,?)";
         String sql = SQL_INSERT + TABLE_MODELS + str_clause;
         List<String> listStr = new ArrayList<>();
