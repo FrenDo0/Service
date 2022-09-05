@@ -1,3 +1,6 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -111,8 +114,8 @@ public abstract class Users extends DbConnection{
             }
             ps.executeUpdate();
         }catch (SQLException e){
-            System.out.println(e.getMessage());
-            System.out.println("dbUpdate method SQL Exception");
+            writeExceptionToFile(e);
+            System.out.println("Exception caught and stored in file !");
         }
     }
 
@@ -132,8 +135,8 @@ public abstract class Users extends DbConnection{
             }
             ps.executeUpdate();
         }catch (SQLException e){
-            System.out.println(e.getMessage());
-            System.out.println("dbUpdate method SQL Exception");
+            writeExceptionToFile(e);
+            System.out.println("Exception caught and stored in file !");
         }
     }
 
@@ -148,7 +151,8 @@ public abstract class Users extends DbConnection{
                 }
             }
         }catch (SQLException e){
-            System.out.println(e.getMessage());
+            writeExceptionToFile(e);
+            System.out.println("Exception caught and stored in file !");
         }
         return result;
     }
@@ -171,7 +175,8 @@ public abstract class Users extends DbConnection{
                 }
             }
         }catch (SQLException e){
-            System.out.println(e.getMessage());
+          writeExceptionToFile(e);
+          System.out.println("Exception caught and stored in file !");
         }
         return result;
     }
@@ -185,9 +190,9 @@ public abstract class Users extends DbConnection{
                 list.put(rs.getInt("id_brand"),rs.getString("brand_name"));
             }
 
-        }catch(Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("getBrands method SQL Exception");
+        }catch(SQLException e){
+            writeExceptionToFile(e);
+            System.out.println("Exception caught and stored in file !");
         }
         return list;
     }
@@ -202,9 +207,9 @@ public abstract class Users extends DbConnection{
                 list.put(rs.getInt("id_model"),rs.getString("model_name"));
             }
 
-        }catch(Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("getModels method SQL Exception");
+        }catch(SQLException e){
+            writeExceptionToFile(e);
+            System.out.println("Exception caught and stored in file !");
         }
         return list;
     }
@@ -223,9 +228,9 @@ public abstract class Users extends DbConnection{
                 }
                 list.get(key).add(rs.getString("model_name"));
             }
-        }catch(Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("printAllBrandAndModels method SQL Exception");
+        }catch(SQLException e){
+            writeExceptionToFile(e);
+            System.out.println("Exception caught and stored in file !");
         }
         return  list;
     }
@@ -242,9 +247,9 @@ public abstract class Users extends DbConnection{
                 isExisting = true;
             }
 
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("isExisting method SQL Exception");
+        }catch (SQLException e){
+            writeExceptionToFile(e);
+            System.out.println("Exception caught and stored in file !");
         }
         return isExisting;
     }
@@ -262,9 +267,9 @@ public abstract class Users extends DbConnection{
             if(rs.next()){
                 role = rs.getString("user_role");
             }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("checkRole method SQL Exception");
+        }catch (SQLException e){
+            writeExceptionToFile(e);
+            System.out.println("Exception caught and stored in file !");
         }
         return  role;
     }
@@ -351,6 +356,25 @@ public abstract class Users extends DbConnection{
         dbUpdate(sql,list);
     }
 
+    public void writeExceptionToFile(SQLException e){
+        try {
+            FileWriter file = new FileWriter("exception.txt", true);
+            BufferedWriter out = new BufferedWriter(file);
+            PrintWriter print = new PrintWriter(out, true);
+            Date date = new Date();
+            print.println("New exception \n ***********");
+            e.printStackTrace(print);
+            print.println("SQLException caught !");
+            print.println(date.toString());
+            print.println("*****************");
+            file.close();
+            out.close();
+            print.close();
+        }
+        catch (Exception ie) {
+            throw new RuntimeException("Could not write Exception to file", ie);
+        }
+    }
 }
 
 

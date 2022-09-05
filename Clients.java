@@ -1,6 +1,7 @@
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,7 +42,7 @@ public class Clients extends Users{
     public Clients getUserInformation(int userID){
         Clients cl = new Clients();
         str_clause = " WHERE id_user=?";
-        try(Connection con = (Connection) DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_USERS+str_clause))
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_USERS+str_clause))
         {
             ps.setInt(1,userID);
             ResultSet rs = ps.executeQuery();
@@ -52,9 +53,9 @@ public class Clients extends Users{
                 cl.setPassword(rs.getString("user_password"));
                 cl.setRole(rs.getString("user_role"));
             }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("getUserInformation method SQL Exception");
+        }catch (SQLException e){
+            writeExceptionToFile(e);
+            System.out.println("Exception caught and stored in file !");
         }
         return cl;
     }
@@ -79,9 +80,9 @@ public class Clients extends Users{
                 req.setStatus(rs.getString("status"));
                 list.add(req);
             }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("printRequestByClientID method SQL Exception");
+        }catch (SQLException e){
+            writeExceptionToFile(e);
+            System.out.println("Exception caught and stored in file !");
         }
         return  list;
     }

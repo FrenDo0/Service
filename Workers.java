@@ -1,6 +1,7 @@
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,9 +46,9 @@ public class Workers extends Users{
                 cl.setPassword(rs.getString("user_password"));
                 cl.setRole(rs.getString("user_role"));
             }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("getUserInformation method SQL Exception");
+        }catch (SQLException e){
+            writeExceptionToFile(e);
+            System.out.println("Exception caught and stored in file !");
         }
         return cl;
     }
@@ -131,9 +132,9 @@ public class Workers extends Users{
                 req.setStatus(rs.getString("status"));
                 list.add(req);
             }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println("printAllRequests method SQL Exception");
+        }catch (SQLException e){
+            writeExceptionToFile(e);
+            System.out.println("Exception caught and stored in file !");
         }
         return  list;
     }
