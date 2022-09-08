@@ -22,6 +22,10 @@ public class DbConnection {
         }
     }
     public static Connection getConnection(){
+        if(con == null){
+            System.out.println("Problem with database connection !");
+            System.exit(1);
+        }
         return con;
     }
 
