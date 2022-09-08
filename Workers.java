@@ -47,7 +47,7 @@ public class Workers extends Users{
                 cl.setRole(rs.getString("user_role"));
             }
         }catch (SQLException e){
-            writeExceptionToFile(e);
+            wr.writeExceptionToFile(e);
             System.out.println("Exception caught and stored in file !");
         }
         return cl;
@@ -116,7 +116,7 @@ public class Workers extends Users{
         List<Requests> list = new ArrayList<>();
         try
         {
-            Connection con = (Connection) DbConnection.getConnection();
+            Connection con = DbConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_REQUESTS);
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
@@ -133,7 +133,7 @@ public class Workers extends Users{
                 list.add(req);
             }
         }catch (SQLException e){
-            writeExceptionToFile(e);
+            wr.writeExceptionToFile(e);
             System.out.println("Exception caught and stored in file !");
         }
         return  list;

@@ -54,7 +54,7 @@ public class Clients extends Users{
                 cl.setRole(rs.getString("user_role"));
             }
         }catch (SQLException e){
-            writeExceptionToFile(e);
+            wr.writeExceptionToFile(e);
             System.out.println("Exception caught and stored in file !");
         }
         return cl;
@@ -81,7 +81,7 @@ public class Clients extends Users{
                 list.add(req);
             }
         }catch (SQLException e){
-            writeExceptionToFile(e);
+            wr.writeExceptionToFile(e);
             System.out.println("Exception caught and stored in file !");
         }
         return  list;

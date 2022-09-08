@@ -1,13 +1,10 @@
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public abstract class Users extends DbConnection{
+public abstract class Users extends  DbConnection{
 
     private int userID;
     private String firstName;
@@ -97,6 +94,7 @@ public abstract class Users extends DbConnection{
     }
 
     //Methods
+    ExceptionWriter wr = new ExceptionWriter();
     public void dbUpdate(String sql,List<String> strings, List<Integer> ints){
         int position = 1;
         try(Connection con = (Connection) DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)){
@@ -114,7 +112,7 @@ public abstract class Users extends DbConnection{
             }
             ps.executeUpdate();
         }catch (SQLException e){
-            writeExceptionToFile(e);
+            wr.writeExceptionToFile(e);
             System.out.println("Exception caught and stored in file !");
         }
     }
@@ -135,14 +133,14 @@ public abstract class Users extends DbConnection{
             }
             ps.executeUpdate();
         }catch (SQLException e){
-            writeExceptionToFile(e);
+            wr.writeExceptionToFile(e);
             System.out.println("Exception caught and stored in file !");
         }
     }
 
     public List<String> dbSelect(String sql, List<String> columns){
         List<String> result = new ArrayList<>();
-        try(Connection con = (Connection) DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql))
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql))
         {
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
@@ -151,7 +149,7 @@ public abstract class Users extends DbConnection{
                 }
             }
         }catch (SQLException e){
-            writeExceptionToFile(e);
+            wr.writeExceptionToFile(e);
             System.out.println("Exception caught and stored in file !");
         }
         return result;
@@ -175,7 +173,7 @@ public abstract class Users extends DbConnection{
                 }
             }
         }catch (SQLException e){
-          writeExceptionToFile(e);
+          wr.writeExceptionToFile(e);
           System.out.println("Exception caught and stored in file !");
         }
         return result;
@@ -191,7 +189,7 @@ public abstract class Users extends DbConnection{
             }
 
         }catch(SQLException e){
-            writeExceptionToFile(e);
+            wr.writeExceptionToFile(e);
             System.out.println("Exception caught and stored in file !");
         }
         return list;
@@ -208,7 +206,7 @@ public abstract class Users extends DbConnection{
             }
 
         }catch(SQLException e){
-            writeExceptionToFile(e);
+            wr.writeExceptionToFile(e);
             System.out.println("Exception caught and stored in file !");
         }
         return list;
@@ -229,7 +227,7 @@ public abstract class Users extends DbConnection{
                 list.get(key).add(rs.getString("model_name"));
             }
         }catch(SQLException e){
-            writeExceptionToFile(e);
+            wr.writeExceptionToFile(e);
             System.out.println("Exception caught and stored in file !");
         }
         return  list;
@@ -248,7 +246,7 @@ public abstract class Users extends DbConnection{
             }
 
         }catch (SQLException e){
-            writeExceptionToFile(e);
+            wr.writeExceptionToFile(e);
             System.out.println("Exception caught and stored in file !");
         }
         return isExisting;
@@ -268,7 +266,7 @@ public abstract class Users extends DbConnection{
                 role = rs.getString("user_role");
             }
         }catch (SQLException e){
-            writeExceptionToFile(e);
+            wr.writeExceptionToFile(e);
             System.out.println("Exception caught and stored in file !");
         }
         return  role;
@@ -356,25 +354,6 @@ public abstract class Users extends DbConnection{
         dbUpdate(sql,list);
     }
 
-    public void writeExceptionToFile(SQLException e){
-        try {
-            FileWriter file = new FileWriter("exception.txt", true);
-            BufferedWriter out = new BufferedWriter(file);
-            PrintWriter print = new PrintWriter(out, true);
-            Date date = new Date();
-            print.println("New exception \n ***********");
-            e.printStackTrace(print);
-            print.println("SQLException caught !");
-            print.println(date.toString());
-            print.println("*****************");
-            file.close();
-            out.close();
-            print.close();
-        }
-        catch (Exception ie) {
-            throw new RuntimeException("Could not write Exception to file", ie);
-        }
-    }
 }
 
 

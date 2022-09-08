@@ -17,9 +17,12 @@ public class DbConnection {
             con = DriverManager.getConnection(url,username,password);
         }catch (SQLException e){
             System.out.println(e.getMessage());
+            ExceptionWriter wr = new ExceptionWriter();
+            wr.writeExceptionToFile(e);
         }
     }
     public static Connection getConnection(){
         return con;
     }
+
 }
