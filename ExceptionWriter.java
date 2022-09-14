@@ -12,7 +12,7 @@ public class ExceptionWriter {
             Date date = new Date();
             print.println("New exception \n ***********");
             e.printStackTrace(print);
-            print.println("SQLException caught !");
+            print.println("New exception caught !");
             print.println(date);
             print.println("*****************");
         }

@@ -97,7 +97,8 @@ public abstract class Users extends  DbConnection{
     ExceptionWriter wr = new ExceptionWriter();
     public void dbUpdate(String sql,List<String> strings, List<Integer> ints){
         int position = 1;
-        try(Connection con = (Connection) DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)){
+        try(Connection con =DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql);)
+        {
             if(!strings.isEmpty()){
                 for(int i = 0; i < strings.size(); i++){
                     ps.setString(position,strings.get(i));
@@ -119,7 +120,8 @@ public abstract class Users extends  DbConnection{
 
     public void dbUpdate(String sql, List<Object> list){
         int position = 1;
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)){
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql);)
+        {
             if(!list.isEmpty()){
                 for(int i = 0; i < list.size(); i++){
                     if(list.get(i) instanceof String){
@@ -138,14 +140,14 @@ public abstract class Users extends  DbConnection{
         }
     }
 
-    public List<String> dbSelect(String sql, List<String> columns){
-        List<String> result = new ArrayList<>();
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql))
+    public List<Object> dbSelect(String sql, List<Object> columns){
+        List<Object> result = new ArrayList<>();
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql);)
         {
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 for(int i = 0; i < columns.size(); i++){
-                    result.add(rs.getString(columns.get(i)));
+                    result.add(rs.getString(String.valueOf(columns.get(i))));
                 }
             }
         }catch (SQLException e){
@@ -155,21 +157,25 @@ public abstract class Users extends  DbConnection{
         return result;
     }
 
-    public List<Object> dbSelect(String sql,String column, Object condition){
+    public List<Object> dbSelect(String sql,List<Object> columns, Object condition){
         List<Object> result = new ArrayList<>();
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql))
+        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql);)
         {
             if(condition instanceof String){
                 ps.setString(1, (String) condition);
                 ResultSet rs = ps.executeQuery();
-                if(rs.next()){
-                    result.add(rs.getInt(column));
+                while(rs.next()){
+                    for(int i = 0; i < columns.size(); i++){
+                        result.add(rs.getString(String.valueOf(columns.get(i))));
+                    }
                 }
             }else if(condition instanceof Integer){
                 ps.setInt(1,(Integer) condition);
                 ResultSet rs = ps.executeQuery();
-                if(rs.next()){
-                    result.add(rs.getString(column));
+                while(rs.next()){
+                    for(int i = 0; i < columns.size(); i++){
+                        result.add(rs.getString(String.valueOf(columns.get(i))));
+                    }
                 }
             }
         }catch (SQLException e){
@@ -181,7 +187,8 @@ public abstract class Users extends  DbConnection{
 
     public Map<Integer,String> getBrands(){
         Map<Integer,String> list = new HashMap<>();
-        try(Connection con = DbConnection.getConnection(); PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_BRANDS))
+        try(Connection con = DbConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_BRANDS);)
         {
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
@@ -198,7 +205,8 @@ public abstract class Users extends  DbConnection{
     public Map<Integer,String> getModels(){
 
         Map<Integer,String> list = new HashMap<>();
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_MODELS))
+        try(Connection con = DbConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_MODELS);)
         {
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
@@ -216,7 +224,8 @@ public abstract class Users extends  DbConnection{
 
         Map<String,List<String>> list = new LinkedHashMap<>();
         String sql = "SELECT b.brand_name, m.model_name FROM brands b, models m WHERE b.id_brand = m.brand_id";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(sql))
+        try(Connection con = DbConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);)
         {
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
@@ -236,7 +245,8 @@ public abstract class Users extends  DbConnection{
     public boolean isExisting(String userName,String passWord){
         boolean isExisting = false;
         str_clause = " WHERE user_username=? AND user_password=?";
-        try(Connection con = DbConnection.getConnection();PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_USERS+str_clause))
+        try(Connection con = DbConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_USERS+str_clause);)
         {
             ps.setString(1,userName);
             ps.setString(2,passWord);
@@ -253,12 +263,11 @@ public abstract class Users extends  DbConnection{
     }
 
     public String checkRole(String userName,String pass){
+        String sql = "SELECT user_role FROM users WHERE user_username=? AND user_password=?";
         String role = "";
-        try
+        try( Connection con = DbConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);)
         {
-            Connection con = DbConnection.getConnection();
-            String sql = "SELECT user_role FROM users WHERE user_username=? AND user_password=?";
-            PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1,userName);
             ps.setString(2,pass);
             ResultSet rs = ps.executeQuery();
@@ -272,8 +281,8 @@ public abstract class Users extends  DbConnection{
         return  role;
     }
 
-    public List<String> printServices(){
-        List<String> list = new ArrayList<>();
+    public List<Object> printServices(){
+        List<Object> list = new ArrayList<>();
         list.add("service_name");
         String sql = SQL_SELECT + TABLE_SERVICE;
         return dbSelect(sql,list);
@@ -283,7 +292,8 @@ public abstract class Users extends  DbConnection{
         List<Object> list = new ArrayList<>();
         str_clause = " WHERE user_username=?";
         String sql = SQL_SELECT + TABLE_USERS + str_clause;
-        String column = "id_user";
+        List<Object> column = new ArrayList<>();
+        column.add("id_user");
         list.add(dbSelect(sql,column,username));
         return list;
     }
@@ -292,7 +302,8 @@ public abstract class Users extends  DbConnection{
         List<Object> list = new ArrayList<>();
         str_clause = " WHERE brand_name=?";
         String sql = SQL_SELECT+TABLE_BRANDS+str_clause;
-        String column = "id_brand";
+        List<Object> column = new ArrayList<>();
+        column.add("id_brand");
         list.add((dbSelect(sql,column,brand)));
         return list;
     }
@@ -301,7 +312,8 @@ public abstract class Users extends  DbConnection{
         String name = "";
         str_clause = " WHERE id_brand=?";
         String sql = SQL_SELECT+TABLE_BRANDS+str_clause;
-        String column = "brand_name";
+        List<Object> column = new ArrayList<>();
+        column.add("brand_name");
         List<Object> list = dbSelect(sql,column,brandID);
         name = (String) list.get(0);
         return name;
@@ -310,7 +322,8 @@ public abstract class Users extends  DbConnection{
     public String getModelName(int modelID){
         String name = "";
         str_clause = " WHERE id_model=?";
-        String column = "model_name";
+        List<Object> column = new ArrayList<>();
+        column.add("model_name");
         String sql = SQL_SELECT+TABLE_MODELS+str_clause;
         List<Object> list = dbSelect(sql,column,modelID);
         name = (String) list.get(0);
@@ -320,17 +333,29 @@ public abstract class Users extends  DbConnection{
     public Object getModelID(String model){
         List<Object> list = new ArrayList<>();
         str_clause = " WHERE model_name=?";
-        String column = "id_model";
+        List<Object> column = new ArrayList<>();
+        column.add("id_model");
         String sql = SQL_SELECT+TABLE_MODELS+str_clause;
         list.add(dbSelect(sql,column,model));
 
         return list;
     }
 
+    public List<Object> getModelsByBrand(int brandID){
+        List<Object> list = new ArrayList<>();
+        str_clause = " WHERE brand_id=?";
+        List<Object> column = new ArrayList<>();
+        column.add("model_name");
+        String sql = SQL_SELECT+TABLE_MODELS+str_clause;
+        list = dbSelect(sql,column,brandID);
+        return list;
+    }
+
     public String getService(int serviceID){
         String name = "";
         str_clause = " WHERE id_service=?";
-        String column = "service_name";
+        List<Object> column = new ArrayList<>();
+        column.add("service_name");
         String sql = SQL_SELECT+TABLE_SERVICE+str_clause;
         List<Object> list = dbSelect(sql,column,serviceID);
         name = (String) list.get(0);
@@ -341,7 +366,8 @@ public abstract class Users extends  DbConnection{
         List<Object> list = new ArrayList<>();
         str_clause = " WHERE service_name=?";
         String sql = SQL_SELECT+TABLE_SERVICE+str_clause;
-        String column = "id_service";
+        List<Object> column = new ArrayList<>();
+        column.add("id_service");
         list.add(dbSelect(sql,column,service));
         return list;
     }

@@ -6,8 +6,8 @@ import java.util.ResourceBundle;
 public class DbConnection {
 
     private static Connection con;
-    static
-    {
+
+    public static synchronized Connection getConnection(){
         ResourceBundle rb = ResourceBundle.getBundle("connection");
         String url = rb.getString("url");
         String username = rb.getString("username");
@@ -19,12 +19,6 @@ public class DbConnection {
             System.out.println(e.getMessage());
             ExceptionWriter wr = new ExceptionWriter();
             wr.writeExceptionToFile(e);
-        }
-    }
-    public static Connection getConnection(){
-        if(con == null){
-            System.out.println("Problem with database connection !");
-            System.exit(1);
         }
         return con;
     }

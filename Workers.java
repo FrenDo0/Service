@@ -1,7 +1,3 @@
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,9 +13,10 @@ public class Workers extends Users{
     @Override
     public String toString(){
 
-        return "Worker details " + this.getFirstName() +" "+ this.getSecondName() +" "
-                + this.getUsername() +" "+ this.getPassword() +" "+ this.getRole();
+        return "\nWorker account details -> " +" First name: "+ this.getFirstName() +" Second name: "+ this.getSecondName() +" Username: "
+                + this.getUsername() +" Password: ****** Role: "+ this.getRole();
     }
+
 
     public void createNewProfile(Users worker){
         str_clause = "(user_fname,user_sname,user_username,user_password,user_role) VALUES (?,?,?,?,?)";
@@ -31,26 +28,35 @@ public class Workers extends Users{
     }
 
     public Workers getUserInformation(int userID){
-        Workers cl = new Workers();
         str_clause = " WHERE id_user=?";
-        try
-        {
-            Connection con = (Connection) DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_USERS+str_clause);
-            ps.setInt(1,userID);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                cl.setFirstName(rs.getString("user_fname"));
-                cl.setSecondName(rs.getString("user_sname"));
-                cl.setUsername(rs.getString("user_username"));
-                cl.setPassword(rs.getString("user_password"));
-                cl.setRole(rs.getString("user_role"));
-            }
-        }catch (SQLException e){
-            wr.writeExceptionToFile(e);
-            System.out.println("Exception caught and stored in file !");
+        String sql = SQL_SELECT+TABLE_USERS+str_clause;
+        List<Object> listColumns = new ArrayList<>();
+        Collections.addAll(listColumns,"user_fname","user_sname","user_username","user_password","user_role");
+        List<Object> listObj = dbSelect(sql,listColumns,userID);
+        int current = 0;
+        Workers worker = new Workers();
+        for(int i = 0; i < 1;i++){
+            worker.setFirstName(String.valueOf(listObj.get(current)));
+            current++;
+            worker.setSecondName(String.valueOf(listObj.get(current)));
+            current++;
+            worker.setUsername(String.valueOf(listObj.get(current)));
+            current++;
+            worker.setPassword(String.valueOf(listObj.get(current)));
+            current++;
+            worker.setRole(String.valueOf(listObj.get(current)));
         }
-        return cl;
+        return worker;
+    }
+
+    public String getUserNames(int userID){
+        str_clause = " WHERE id_user=?";
+        String sql = SQL_SELECT+TABLE_USERS+str_clause;
+        List<Object> listColumns = new ArrayList<>();
+        Collections.addAll(listColumns,"user_fname","user_sname");
+        List<Object> listObj = dbSelect(sql,listColumns,userID);
+        String result = listObj.get(0)+" "+ listObj.get(1);
+        return result;
     }
 
     public void addBrand(String brand){
@@ -62,7 +68,7 @@ public class Workers extends Users{
     }
 
     //String brand, String model -> method getBrandID
-    public void addModel(Integer brandID, String model){
+    public void addModel(int brandID, String model){
         str_clause = " (model_name,brand_id) VALUES(?,?)";
         String sql = SQL_INSERT + TABLE_MODELS + str_clause;
         List<String> listStr = new ArrayList<>();
@@ -112,30 +118,132 @@ public class Workers extends Users{
         dbUpdate(sql,list);
     }
 
-    public List<Requests> printAllRequests(){
-        List<Requests> list = new ArrayList<>();
-        try
-        {
-            Connection con = DbConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(SQL_SELECT+TABLE_REQUESTS);
-            ResultSet rs = ps.executeQuery();
-            while(rs.next()){
-                Requests req = new Requests();
-                req.setRequestID(rs.getInt("id_request"));
-                req.setClientID(rs.getInt("client_id"));
-                req.setCarVin(rs.getInt("car_vin"));
-                req.setBrandID(rs.getInt("car_brand_id"));
-                req.setModelID(rs.getInt("car_model_id"));
-                req.setService(rs.getInt("service"));
-                req.setDateLeave(rs.getString("date_leave"));
-                req.setDatePickUp(rs.getString("date_pickup"));
-                req.setStatus(rs.getString("status"));
-                list.add(req);
+    public List<Object> printAllUsersByRole(String role){
+
+        str_clause = " WHERE user_role=?";
+        String sql = SQL_SELECT+TABLE_USERS+str_clause;
+        List<Object> listColumns = new ArrayList<>();
+        Collections.addAll(listColumns,"id_user","user_fname","user_sname","user_username","user_password","user_role");
+        List<Object> listResult = new ArrayList<>();
+        List<Object> listObj = dbSelect(sql,listColumns,role);
+
+        int listSize = listObj.size() / 6;
+        int current = 0;
+        if(role.equals("client")){
+            for(int i = 0; i < listSize; i++){
+                Clients client = new Clients();
+                client.setUserID(Integer.parseInt(listObj.get(current).toString()));
+                current++;
+                client.setFirstName(String.valueOf(listObj.get(current)));
+                current++;
+                client.setSecondName(String.valueOf(listObj.get(current)));
+                current++;
+                client.setUsername(String.valueOf(listObj.get(current)));
+                current++;
+                client.setPassword(String.valueOf(listObj.get(current)));
+                current++;
+                client.setRole(String.valueOf(listObj.get(current)));
+                current++;
+                listResult.add(client);
             }
-        }catch (SQLException e){
-            wr.writeExceptionToFile(e);
-            System.out.println("Exception caught and stored in file !");
+        }else if(role.equals("worker")){
+            for(int i = 0; i < listSize; i++){
+                Workers worker = new Workers();
+                worker.setUserID(Integer.parseInt(listObj.get(current).toString()));
+                current++;
+                worker.setFirstName(String.valueOf(listObj.get(current)));
+                current++;
+                worker.setSecondName(String.valueOf(listObj.get(current)));
+                current++;
+                worker.setUsername(String.valueOf(listObj.get(current)));
+                current++;
+                worker.setPassword(String.valueOf(listObj.get(current)));
+                current++;
+                worker.setRole(String.valueOf(listObj.get(current)));
+                current++;
+                listResult.add(worker);
+            }
+        }else{
+            System.out.println("Wrong role !");
         }
-        return  list;
+        return listResult;
     }
+
+    public List<Requests> printSortedRequests(String sort){
+        str_clause = " WHERE status=?";
+        String sql = SQL_SELECT+TABLE_REQUESTS+str_clause;
+        List<Object> listStr = new ArrayList<>();
+        Collections.addAll(listStr,"id_request","client_id","car_vin","car_brand_id","car_model_id","service","date_leave","date_pickup","status");
+        List<Requests> listReq = new ArrayList<>();
+        List<Object> list = dbSelect(sql,listStr,sort);
+        int listSize = list.size() / 9;
+        int current = 0;
+        for(int i = 0; i <listSize; i++){
+            Requests req = new Requests();
+            req.setRequestID(Integer.parseInt(list.get(current).toString()));
+            current++;
+            req.setClientID(Integer.parseInt(list.get(current).toString()));
+            current++;
+            req.setCarVin(Integer.parseInt(list.get(current).toString()));
+            current++;
+            req.setBrandID(Integer.parseInt(list.get(current).toString()));
+            current++;
+            req.setModelID(Integer.parseInt(list.get(current).toString()));
+            current++;
+            req.setService(Integer.parseInt(list.get(current).toString()));
+            current++;
+            req.setDateLeave(String.valueOf(list.get(current)));
+            current++;
+            req.setDatePickUp(String.valueOf(list.get(current)));
+            current++;
+            req.setStatus(String.valueOf(list.get(current)));
+            current++;
+            listReq.add(req);
+        }
+        return listReq;
+    }
+
+    public List<Requests> printAllRequests(){
+        String sql = SQL_SELECT+TABLE_REQUESTS;
+        List<Object> listColumns = new ArrayList<>();
+        Collections.addAll(listColumns,"id_request","client_id","car_vin","car_brand_id","car_model_id","service","date_leave","date_pickup","status");
+        List<Requests> listReq = new ArrayList<>();
+        List<Object> listObj = dbSelect(sql,listColumns);
+        int listSize = listObj.size() / 9;
+        int current = 0;
+        for(int i = 0; i <listSize; i++){
+            Requests req = new Requests();
+            req.setRequestID(Integer.parseInt(listObj.get(current).toString()));
+            current++;
+            req.setClientID(Integer.parseInt(listObj.get(current).toString()));
+            current++;
+            req.setCarVin(Integer.parseInt(listObj.get(current).toString()));
+            current++;
+            req.setBrandID(Integer.parseInt(listObj.get(current).toString()));
+            current++;
+            req.setModelID(Integer.parseInt(listObj.get(current).toString()));
+            current++;
+            req.setService(Integer.parseInt(listObj.get(current).toString()));
+            current++;
+            req.setDateLeave(String.valueOf(listObj.get(current)));
+            current++;
+            req.setDatePickUp(String.valueOf(listObj.get(current)));
+            current++;
+            req.setStatus(String.valueOf(listObj.get(current)));
+            current++;
+            listReq.add(req);
+        }
+        return listReq;
+    }
+
+    public void changeRequestStatus(int requestID,String status){
+        String sql = "UPDATE requests SET status=? WHERE id_request=?";
+        List<String> listStr = new ArrayList<>();
+        List<Integer> listInt = new ArrayList<>();
+        listStr.add(status);
+        listInt.add(requestID);
+        dbUpdate(sql,listStr,listInt);
+    }
+
+
 }
